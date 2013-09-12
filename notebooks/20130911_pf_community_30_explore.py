@@ -16,11 +16,7 @@ vcf_fn = '../data/production_files/Pf/3_0/merged_hetuniq_newbiallelic_20130809.v
 
 # <codecell>
 
-!zcat {vcf_fn} | head -n20
-
-# <codecell>
-
-!zcat {vcf_fn} | head -n50 | tail
+!zcat {vcf_fn} | head -n19
 
 # <codecell>
 
@@ -49,11 +45,6 @@ if not os.path.exists(vcf_bgz_fn + '.tbi'):
 import vcfnp
 import numpy as np
 import sys
-
-# <codecell>
-
-import vcflib
-from itertools import islice
 
 # <codecell>
 
