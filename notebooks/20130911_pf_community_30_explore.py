@@ -86,7 +86,7 @@ def load_arrays(vcf_fn, region):
 
 # <codecell>
 
-chrom = 'Pf3D7_01_v3'
+chrom = 'Pf3D7_04_v3'
 
 # <codecell>
 
@@ -204,7 +204,7 @@ figure(figsize=(16, 4))
 
 subplot2grid((4, 1), (0, 0), rowspan=3)
 window = 10000
-bins = arange(0, 650000, window)
+bins = arange(0, max(V.POS), window)
 X = bins[:-1] + window/2
 Y, _ = histogram(V.POS, bins=bins)
 plot(X, Y*1./window, linewidth=2, label='all SNPs')
@@ -235,14 +235,14 @@ figure(figsize=(16, 4))
 
 subplot2grid((4, 1), (0, 0), rowspan=3)
 window = 10000
-bins = arange(0, 650000, window)
+bins = arange(0, max(V.POS), window)
 X = bins[:-1] + window/2
 pos = V.POS[I.CODING]
 values = I.DP[I.CODING]
 
 # outer percentiles
-Y1, _, _ = stats.binned_statistic(pos, values, statistic=lambda a: percentile(a, 5), bins=bins)
-Y2, _, _ = stats.binned_statistic(pos, values, statistic=lambda a: percentile(a, 95), bins=bins)
+Y1, _, _ = stats.binned_statistic(pos, values, statistic=lambda a: percentile(a, 1), bins=bins)
+Y2, _, _ = stats.binned_statistic(pos, values, statistic=lambda a: percentile(a, 99), bins=bins)
 check = (Y2 > 0) & (Y2 > Y1)
 fill_between(X[check], Y1[check], Y2[check], color='b', alpha=.2)
 # quartiles
@@ -266,6 +266,62 @@ broken_barh(xranges, (0, 1), color=[colors[r.region] for r in tbl_regions.eq('ch
 yticks([])
 xlim(0, max(V.POS))
 xlabel('%s position (bp)' % chrom)
+
+# <codecell>
+
+tbl_gc = (etl
+    .fromtsv('../data/plasmodium/pfalciparum/pf-crosses/data/genome/sanger/version3/September_2012/Pf3D7_v3.gc.300.txt.gz')
+    .pushheader(['chrom', 'pos', 'gc300'])
+    .convertnumbers()
+)
+tbl_gc.head()
+
+# <codecell>
+
+tbl_variants_with_gc = (
+    tbl_variants
+    .rename({'CHROM': 'chrom', 'POS': 'pos'})
+    .leftjoin(tbl_gc, key=('chrom', 'pos'), presorted=True, missing=-1)
+)
+tbl_variants_with_gc.head()
+
+# <codecell>
+
+gc300 = tbl_variants_with_gc.cut('gc300').torecarray(dtype={'gc300': 'f4'}).gc300
+
+# <codecell>
+
+figure()
+hist(gc300[I.CODING], histtype='step', linewidth=2, bins=arange(0, 100, 2), label='coding')
+hist(gc300[~I.CODING & (region == 'SubtelomericRepeat')], histtype='step', linewidth=2, bins=arange(0, 100, 2), label='non-coding subtelomeric repeat')
+hist(gc300[~I.CODING & (region != 'SubtelomericRepeat')], histtype='step', linewidth=2, bins=arange(0, 100, 2), label='non-coding other')
+xlabel('GC')
+ylabel('frequency')
+legend()
+
+# <codecell>
+
+figure()
+flt = (region == 'Core') & I.CODING
+X = gc300[flt]
+Y = I.DP[flt]
+plot(X, Y, 'bo', alpha=.05)
+xlabel('GC')
+ylabel('DP')
+figure()
+hexbin(X, Y)
+xlabel('GC')
+ylabel('DP')
+
+# <codecell>
+
+figure(figsize=(16, 4))
+hist(I.DP[(region == 'Core') & I.CODING], bins=linspace(0, 600000, 150), histtype='step', linewidth=2, label='core coding')
+hist(I.DP[(region == 'Core') & (gc300 >= 20) & I.CODING], bins=linspace(0, 600000, 150), histtype='step', linewidth=2, label='core coding, GC>=20%')
+hist(I.DP[(region == 'Core') & (gc300 < 20) & I.CODING], bins=linspace(0, 600000, 150), histtype='step', linewidth=2, label='core coding, GC<20')
+legend()
+xlabel('DP')
+ylabel('frequency')
 
 # <codecell>
 
