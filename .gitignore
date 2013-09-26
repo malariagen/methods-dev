@@ -36,3 +36,8 @@ nosetests.xml
 
 # misc
 data
+notebooks/files
+log
+log_old
+# meta removed as potentially sensitive data, e.g. 2.2 release metadata
+meta
