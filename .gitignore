@@ -41,3 +41,9 @@ log
 log_old
 # meta removed as potentially sensitive data, e.g. 2.2 release metadata
 meta
+
+# binaries
+opt
+pf3k_techbm/opt
+recon/opt
+
