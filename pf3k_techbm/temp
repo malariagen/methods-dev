@@ -1,0 +1,4 @@
+# added by Ipython notebook 20150603_install_GATK.ipynb
+
+export PATH="/Users/rpearson/src/github/malariagen/methods-dev/pf3k_techbm/opt/bwa/bwa-0.7.12:/Users/rpearson/anaconda/bin:/Users/rpearson/Library/Enthought/Canopy_64bit/User/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/opt/X11/bin:/usr/local/ncbi/blast/bin:/Users/rpearson/bin:/Users/rpearson/bin/samtools/samtools-0.1.19:/Users/rpearson/bin/bedtools/bedtools2-2.19.1/bin:/Users/rpearson/bin/vcftools/vcftools_0.1.12a/bin"
+export PATH="/Users/rpearson/src/github/malariagen/methods-dev/pf3k_techbm/opt/bwa/bwa-0.7.12:$PATH"
