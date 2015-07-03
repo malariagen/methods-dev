@@ -47,6 +47,10 @@ gatk_dir = install_dir + '/gatk'
 !mkdir -p {gatk_dir}
 gatk_exe = 'java -jar ' + gatk_dir + '/GenomeAnalysisTK.jar'
 
+snpeff_dir = install_dir + '/snpeff'
+!mkdir -p {snpeff_dir}
+snpeff_exe = 'java -jar ' + snpeff_dir + '/snpEff/snpEff.jar'
+
 # <headingcell level=1>
 
 # Install bwa
@@ -175,6 +179,29 @@ gatk_exe = 'java -jar ' + gatk_dir + '/GenomeAnalysisTK.jar'
 
 # Test GATK
 !{gatk_exe} -T VariantsToAllelicPrimitives -h
+
+# <headingcell level=1>
+
+# Install SnpEff
+
+# <codecell>
+
+%cd {snpeff_dir}
+!wget http://sourceforge.net/projects/snpeff/files/snpEff_latest_core.zip
+!unzip snpEff_latest_core.zip
+%cd ../../notebooks/
+
+# <codecell>
+
+!{snpeff_exe} databases | grep -i plasmodium
+
+# <codecell>
+
+!{snpeff_exe} download Pf3D7v91
+
+# <codecell>
+
+snpeff_exe
 
 # <codecell>
 

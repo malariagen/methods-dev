@@ -8,6 +8,7 @@
 # <codecell>
 
 %run standard_imports.ipynb
+%run plotting_setup.ipynb
 
 # <headingcell level=1>
 
@@ -27,7 +28,8 @@ REF_GENOME = '/data/plasmodium/pfalciparum/recon/roamato/Pf3D7_v3/3D7_sorted.fa'
 PGV4_VCF_FN = '/nfs/team112_internal/production_files/Pf/4_0/pf_4_0_20140712_vfp1.newCoverageFilters_pass_5_99.5.HyperHet.vcf.gz'
 
 BCFTOOLS_EXE = '/Users/rpearson/src/github/malariagen/methods-dev/pf3k_techbm/opt/bcftools/bcftools-1.2/bcftools'
-GATK_EXE = 'java -jar /Users/rpearson/src/github/malariagen/methods-dev/pf3k_techbm/opt/gatk/GenomeAnalysisTK.jar'
+GATK_EXE = 'java -jar /Users/rpearson/src/github/malariagen/methods-dev/recon/opt/gatk/GenomeAnalysisTK.jar'
+BWA_EXE = '/Users/rpearson/src/github/malariagen/methods-dev/recon/opt/bwa/bwa-0.7.12/bwa'
 
 # <headingcell level=1>
 
@@ -67,8 +69,8 @@ tbl_sample_sets
 @etlcache
 def tbl_pgv4_sample_manifest():
     return (etl
-        .fromxlsx(SAMPLE_MANIFEST_FN, 'PGV4.0')
-        .convertnumbers()
+        .fromxlsx(SAMPLE_MANIFEST_FN, 'PGV4.0', data_only=True)
+#         .convertnumbers()
     )
 print(len(tbl_pgv4_sample_manifest.data()))
 tbl_pgv4_sample_manifest

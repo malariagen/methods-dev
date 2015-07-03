@@ -1,0 +1,5 @@
+# The following table is formatted as tab separated values. 
+#GeneName	GeneId	TranscriptId	BioType	variants_impact_MODERATE	variants_impact_MODIFIER	variants_effect_DOWNSTREAM	variants_effect_NON_SYNONYMOUS_CODING	variants_effect_UPSTREAM	bases_affected_DOWNSTREAM	total_score_DOWNSTREAM	length_DOWNSTREAM	bases_affected_EXON	total_score_EXON	length_EXON	bases_affected_UPSTREAM	total_score_UPSTREAM	length_UPSTREAM
+PF3D7_1343500	PF3D7_1343500	rna_PF3D7_1343500-1		0	7	7	0	0	7	0	5000	0	0	0	0	0	0
+PF3D7_1343600	PF3D7_1343600	rna_PF3D7_1343600-1		0	7	0	0	7	0	0	0	0	0	0	7	0	5000
+PF3D7_1343700	PF3D7_1343700	rna_PF3D7_1343700-1		7	0	0	7	0	0	0	0	7	0	2181	0	0	0

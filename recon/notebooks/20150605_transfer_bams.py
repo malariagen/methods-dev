@@ -50,6 +50,16 @@ for rec in tbl_sample_bam_info.data():
     !rsync -avL malsrv2:{rec[2]} {rec[3]}
     !samtools index {rec[2]}
 
+# <headingcell level=1>
+
+# Transfer bams for capilliary sequenced data
+
 # <codecell>
 
+for rec in tbl_sample_bam_info.data():
+    if rec[0] in ['PA0155-C', 'PA0223-C', 'PH022-C']:
+        print(rec[2])
+        !mkdir -p {rec[3]}
+        !rsync -avL malsrv2:{rec[2]} {rec[3]}
+        !samtools index {rec[2]}
 

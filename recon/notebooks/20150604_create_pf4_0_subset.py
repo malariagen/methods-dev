@@ -124,7 +124,7 @@ fo.write("##fileformat=VCFv4.1\n")
 fo.write("##description=This file created with 20150604_create_pf4_0_subset.ipynb\n")
 fo.write("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t%s\n" % samples_string)
 for i, rec in enumerate(tbl_pivoted_genotypes.data()):
-    variant_info_string = "%s\t%s\t.\t%s\t%s\t.\tPASS\t.\tGT\t" % (rec[0], rec[1], ref_bases[i], alt_bases[i])
+    variant_info_string = "%s\t%s\t.\t%s\t%s\t.\tPASS\t.\tGT" % (rec[0], rec[1], ref_bases[i], alt_bases[i])
     genotypes_string = "\t".join(vcf_calls[i, :])
     fo.write(variant_info_string + "\t" + genotypes_string + "\n")
 fo.close()

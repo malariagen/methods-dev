@@ -18,10 +18,35 @@
 PGV_METADATA_FN = '../../meta/Pf/PGV4_mk5.xlsx'
 PF3K_PANOPTES_FN = '../../meta/Pf/Pf3k_release3_panoptes_samples.txt'
 PF_SOLARIS_FN = '../../meta/Pf/PF_samples_Richard_RDP.xlsx'
+ASSEMBLED_SAMPLES_FN = '../meta/PacBio samples draft 20150622.xlsx'
+PROCESSED_ASSEMBLED_SAMPLES_DIR = '/nfs/team112_internal/production_files/Pf3k/methods/assembled_samples'
+!mkdir {PROCESSED_ASSEMBLED_SAMPLES_DIR}
 
-DATA_DIR = '../meta/20150617'
-CACHE_DIR = DATA_DIR + '/cache'
+# DATA_DIR = '../meta/20150617'
+CACHE_DIR = '../meta/cache'
 !mkdir -p {CACHE_DIR}
+
+REF_GENOME = '/data/plasmodium/pfalciparum/recon/roamato/Pf3D7_v3/3D7_sorted.fa'
+
+crosses_dir = '/data/plasmodium/pfalciparum/pf-crosses/data/public/1.0'
+
+# <codecell>
+
+install_dir = '../opt'
+bwa_dir = install_dir + '/bwa'
+bwa_exe = bwa_dir + '/bwa-0.7.12/bwa'
+
+samtools_dir = install_dir + '/samtools'
+samtools_exe = samtools_dir + '/samtools-1.2/samtools'
+
+picard_dir = install_dir + '/picard'
+picard_exe = 'java -jar ' + picard_dir + '/picard-tools-1.133/picard.jar'
+
+bcftools_dir = install_dir + '/bcftools'
+bcftools_exe = bcftools_dir + '/bcftools-1.2/bcftools'
+
+gatk_dir = install_dir + '/gatk'
+gatk_exe = 'java -jar ' + gatk_dir + '/GenomeAnalysisTK.jar'
 
 # <headingcell level=1>
 
@@ -104,6 +129,15 @@ def tbl_pf_solaris():
         .cut(['ox_code', 'oxford_code', 'oxcode', 'creation_date', 'Dna_Extraction_date', 'sample_creation_date', 'contribution_arrival_date'])
     )
 print("tbl_pf_solaris length = %d" % len(tbl_pf_solaris.data()))
+
+# <codecell>
+
+@etlcache
+def tbl_assembled_samples():
+    return (etl
+        .fromxlsx(ASSEMBLED_SAMPLES_FN, data_only=True)
+    )
+print("tbl_assembled_samples length = %d" % len(tbl_assembled_samples.data()))
 
 # <codecell>
 
