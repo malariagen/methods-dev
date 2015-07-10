@@ -18,7 +18,8 @@
 PGV_METADATA_FN = '../../meta/Pf/PGV4_mk5.xlsx'
 PF3K_PANOPTES_FN = '../../meta/Pf/Pf3k_release3_panoptes_samples.txt'
 PF_SOLARIS_FN = '../../meta/Pf/PF_samples_Richard_RDP.xlsx'
-ASSEMBLED_SAMPLES_FN = '../meta/PacBio samples draft 20150622.xlsx'
+# ASSEMBLED_SAMPLES_FN = '../meta/PacBio samples draft 20150622.xlsx'
+ASSEMBLED_SAMPLES_FN = '../meta/PacBio samples draft 26062015_RDP_20150706.xlsx'
 PROCESSED_ASSEMBLED_SAMPLES_DIR = '/nfs/team112_internal/production_files/Pf3k/methods/assembled_samples'
 !mkdir {PROCESSED_ASSEMBLED_SAMPLES_DIR}
 
@@ -29,6 +30,7 @@ CACHE_DIR = '../meta/cache'
 REF_GENOME = '/data/plasmodium/pfalciparum/recon/roamato/Pf3D7_v3/3D7_sorted.fa'
 
 crosses_dir = '/data/plasmodium/pfalciparum/pf-crosses/data/public/1.0'
+regions_fn = '../../../pf-crosses/meta/regions-20130225.bed.gz'
 
 # <codecell>
 
@@ -47,6 +49,9 @@ bcftools_exe = bcftools_dir + '/bcftools-1.2/bcftools'
 
 gatk_dir = install_dir + '/gatk'
 gatk_exe = 'java -jar ' + gatk_dir + '/GenomeAnalysisTK.jar'
+
+snpeff_dir = install_dir + '/snpeff/snpEff'
+snpeff_exe = 'java -jar ' + snpeff_dir + '/snpEff.jar'
 
 # <headingcell level=1>
 
