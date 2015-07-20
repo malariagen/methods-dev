@@ -9,6 +9,7 @@
 
 thomas_genome_fn = '/nfs/pathogen003/tdo/Pfalciparum/3D7/Reference/Oct2011/Pf3D7_v3.fasta'
 thomas_api_fn = '/nfs/pathogen003/tdo/Pfalciparum/3D7/Reference/Oct2011/PFC10_API_IRAB_RDP.embl'
+thomas_mt_fn = '/nfs/pathogen003/tdo/Pfalciparum/3D7/Reference/Oct2011/Pf_M76611.embl'
 plasmodb_24_fn = 'PlasmoDB-24_Pfalciparum3D7_Genome.fasta'
 
 # <codecell>
@@ -41,6 +42,28 @@ api = SeqIO.to_dict(SeqIO.parse(in_seq_handle, "embl"))
 # <codecell>
 
 len(api['XXX.4'])
+
+# <codecell>
+
+in_seq_handle = open(thomas_mt_fn)
+mt = SeqIO.to_dict(SeqIO.parse(in_seq_handle, "embl"))
+len(mt['Pf_M76611.embl'])
+
+# <codecell>
+
+mt['Pf_M76611.embl'].seq
+
+# <codecell>
+
+plasmodb_24['M76611'].seq
+
+# <codecell>
+
+mt['Pf_M76611.embl'].seq == plasmodb_24['M76611'].seq
+
+# <codecell>
+
+plasmodb_24.keys()
 
 # <codecell>
 

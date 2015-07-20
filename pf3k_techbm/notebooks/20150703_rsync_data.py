@@ -8,6 +8,9 @@ tdo_dir = '/nfs/pathogen003/tdo/Pf3K/SNPset/Pf3D7vsPfIT'
 tdo2_dir = '/nfs/pathogen003/tdo/Pfalciparum/PF3K/Reference12Genomes/embl_V1/Fasta_inChromosomes'
 tdo3_dir = '/nfs/pathogen003/tdo/Pfalciparum/3D7/Reference/Oct2011'
 tdo4_dir = '/nfs/pathogen003/tdo/Pfalciparum/PF3K/Reference12Genomes/Sharing_25Jun2015/cram'
+tdo5_dir = '/nfs/pathogen003/tdo/Pfalciparum/PF3K/Reference12Genomes/Sharing_25Jun2015/SNP/Reference'
+tdo6_dir = '/nfs/pathogen003/tdo/Pfalciparum/PF3K/Reference12Genomes/Sharing_25Jun2015/SNP'
+
 IT_dir = '/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/IT'
 
 # <codecell>
@@ -17,6 +20,8 @@ IT_dir = '/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/IT'
 !mkdir -p {tdo2_dir}
 !mkdir -p {tdo3_dir}
 !mkdir -p {tdo4_dir}
+!mkdir -p {tdo5_dir}
+!mkdir -p {tdo6_dir}
 !mkdir -p {IT_dir}
 !mkdir ../log
 
@@ -27,7 +32,9 @@ IT_dir = '/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/IT'
 # !rsync -avL rp7@malsrv2:{tdo2_dir}/ {tdo2_dir} > ../log/20150626_tdo2_dir.log
 # !rsync -avL rp7@malsrv2:{tdo3_dir}/ {tdo3_dir} > ../log/20150703_tdo3_dir.log
 # !rsync -avL rp7@malsrv2:{tdo3_dir}/ {tdo3_dir} > ../log/20150703_tdo3_dir.log
-!rsync -avL rp7@malsrv2:{tdo4_dir}/ {tdo4_dir} > ../log/20150706_tdo4_dir.log
+# !rsync -avL rp7@malsrv2:{tdo4_dir}/ {tdo4_dir} > ../log/20150706_tdo4_dir.log
+# !rsync -avL rp7@malsrv2:{tdo5_dir}/ {tdo5_dir} > ../log/20150713_tdo5_dir.log
+!rsync -avL rp7@malsrv2:{tdo6_dir}/ {tdo6_dir} > ../log/20150714_tdo6_dir.log
 
 # <codecell>
 
