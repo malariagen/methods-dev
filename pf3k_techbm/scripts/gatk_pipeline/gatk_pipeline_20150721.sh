@@ -15,7 +15,7 @@
 
 # directories
 export ORIGINAL_DIR=`pwd`
-export PROCESSED_DATA_DIR="/nfs/team112_internal/production_files/Pf3k/methods/assembled_samples"
+export PROCESSED_DATA_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/assembled_samples"
 
 # software versions
 export PICARD_VERSION="1.136"
@@ -25,7 +25,7 @@ export GATK_VERSION="3.4-46"
 
 # executables
 export JAVA7_EXE="/software/jre1.7.0_25/bin/java"
-export OPT_DIR="/Users/rpearson/src/github/malariagen/methods-dev/pf3k_techbm/opt"
+export OPT_DIR="~/src/github/malariagen/methods-dev/pf3k_techbm/opt"
 export SAMTOOLS_EXE="${OPT_DIR}/samtools/samtools-${SAMTOOLS_VERSION}/samtools"
 export PICARD_EXE="${JAVA7_EXE} -jar ${OPT_DIR}/picard/picard-tools-${PICARD_VERSION}/picard.jar"
 export SNPEFF_DIR="${OPT_DIR}/snpeff/snpEff"
