@@ -17,6 +17,11 @@
 
 # <codecell>
 
+PLOTS_DIR = '/Users/rpearson/Documents/projects/Pf3k_techbm/slides/20150721_GATK_assessment/plots'
+!mkdir -p {PLOTS_DIR}
+
+# <codecell>
+
 # CODING_EFFECTS = ['NON_SYNONYMOUS_CODING', 'SYNONYMOUS_CODING', 'STOP_GAINED']
 NONCODING_EFFECTS = ['INTERGENIC', 'INTRON', 'TRANSCRIPT']
  
@@ -235,7 +240,18 @@ tbl_comparison_7g8_Pf3D7_01_v3
 # <codecell>
 
 def plotROC(isolate_code='7G8', RegionType='Core', IsCoding=True, mode='SNP',
-            min_Truth_distance_nearest=0, min_GATK_distance_nearest=0, sort_by=None, sort_reverse=True):
+            min_Truth_distance_nearest=0, min_GATK_distance_nearest=0, sort_by=None, sort_reverse=True,
+            annotate_values=[0, 2, 4, 6, 8], show_annotations=False, ymax=1.0, xmax=None, ax=None):
+    
+    # set up axes
+    if ax is None:
+        fig, ax = plt.subplots()
+
+#     # set up figure
+#     fig = figure(figsize=(8, 8))
+
+#     # set up roc plot
+#     ax = fig.add_subplot(1, 1, 1)
     
     if(sort_by is None):
         array_to_plot = (tbl_whole_genome_comparisons[isolate_code]
@@ -248,6 +264,8 @@ def plotROC(isolate_code='7G8', RegionType='Core', IsCoding=True, mode='SNP',
             .select(lambda rec: rec['GATK_distance_nearest'] is None or rec['GATK_distance_nearest'] >= min_GATK_distance_nearest)
             .cut(['IsInGATK', 'IsInTruth', 'VQSLOD'])
         ).toarray()
+        annotate_indices = np.array([np.sum(array_to_plot['VQSLOD'] >= value) for value in annotate_values])
+        
     else:
         array_to_plot = (tbl_whole_genome_comparisons[isolate_code]
             .selecteq('IsInGATK', True)
@@ -260,6 +278,7 @@ def plotROC(isolate_code='7G8', RegionType='Core', IsCoding=True, mode='SNP',
             .sort(sort_by, reverse=sort_reverse)
             .cut(['IsInGATK', 'IsInTruth', sort_by])
         ).toarray()
+        annotate_indices = np.array([np.sum(array_to_plot[sort_by] >= value) for value in annotate_values])
 
     TPs = np.cumsum(array_to_plot['IsInTruth'])
     FPs = np.cumsum(np.logical_not(array_to_plot['IsInTruth']))
@@ -285,7 +304,19 @@ def plotROC(isolate_code='7G8', RegionType='Core', IsCoding=True, mode='SNP',
     sensitivity = TPs / number_of_true_variants
     FDR = FPs / number_of_positives
     
-    plot(FDR, sensitivity)
+    
+    ax.plot(FDR, sensitivity, label=isolate_code)
+    if show_annotations:
+        for i, annotate_index in enumerate(annotate_indices):
+            ax.annotate('%s (%4.1f%% sens, %4.1f%% FDR)' % (annotate_values[i], sensitivity[annotate_index]*100, FDR[annotate_index]*100),
+                        (FDR[annotate_index], sensitivity[annotate_index]), xycoords='data', xytext=(10, -10),
+                        textcoords='offset points')
+    if ymax is not None:
+        ax.set_ylim([0, ymax])
+    if xmax is not None:
+        ax.set_xlim([0, xmax])
+            
+    return(ax)
 
 
 # <headingcell level=1>
@@ -386,17 +417,57 @@ aggregation['#GATK accessible'] = ('IsInGATK', 'IsAccessible'), lambda rec: np.s
 aggregation['#TP'] = ('IsInGATK', 'IsInTruth'), lambda rec: np.sum([x[0] and x[1] for x in list(rec)])
 aggregation['#FP'] = ('IsInGATK', 'IsInTruth', 'IsAccessible'), lambda rec: np.sum([x[0] and not x[1] and x[2] for x in list(rec)])
 aggregation['#FN'] = ('IsInGATK', 'IsInTruth'), lambda rec: np.sum([not x[0] and x[1] for x in list(rec)])
+aggregation['#TPmod3'] = ('REF', 'ALT', 'IsInGATK', 'IsInTruth'), lambda rec: np.sum([(len(x[0]) - len(x[1])) % 3 == 0 and x[2] and x[3] for x in list(rec)])
+aggregation['#FPmod3'] = ('REF', 'ALT', 'IsInGATK', 'IsInTruth', 'IsAccessible'), lambda rec: np.sum([(len(x[0]) - len(x[1])) % 3 == 0 and x[2] and not x[3] and x[4] for x in list(rec)])
+aggregation['#FNmod3'] = ('REF', 'ALT', 'IsInGATK', 'IsInTruth'), lambda rec: np.sum([(len(x[0]) - len(x[1])) % 3 == 0 and not x[2] and x[3] for x in list(rec)])
 
 (tbl_whole_genome_comparisons['7G8']
     .aggregate(('RegionType', 'IsCoding', 'mode'), aggregation)
     .convertnumbers()
     .addfield('Unfilt sensitivity', lambda rec: 0.0 if rec['#Truth'] == 0 else round(rec['#TP'] / rec['#Truth'], 3))
     .addfield('Unfilt FDR', lambda rec: 0.0 if rec['#GATK accessible'] == 0 else round(rec['#FP'] / rec['#GATK accessible'], 3))
+    .addfield('%TPmod3', lambda rec: 0.0 if rec['#TP'] == 0 else round(rec['#TPmod3'] / rec['#TP'], 3))
+    .addfield('%FPmod3', lambda rec: 0.0 if rec['#FP'] == 0 else round(rec['#FPmod3'] / rec['#FP'], 3))
+    .addfield('%FNmod3', lambda rec: 0.0 if rec['#FN'] == 0 else round(rec['#FNmod3'] / rec['#FN'], 3))
 ).displayall()
 
 # <codecell>
 
-def calc_variant_summary_table(isolate_code='7G8', min_Truth_distance_nearest=0):
+tbl_whole_genome_comparisons['7G8'].selecteq('mode', 'INDEL').selecteq('IsCoding', True)
+
+# <codecell>
+
+def is_transition(rec):
+    return (((rec[0] == 'A') and (rec[1] == 'G')) 
+             or ((rec[0] == 'G') and (rec[1] == 'A')) 
+             or ((rec[0] == 'C') and (rec[1] == 'T')) 
+             or ((rec[0] == 'T') and (rec[1] == 'C')))
+
+def is_transversion(rec):
+    return (((rec[0] == 'A') and ((rec[1] == 'T') or (rec[1] == 'C')))
+             or ((rec[0] == 'G') and ((rec[1] == 'T') or (rec[1] == 'C')))
+             or ((rec[0] == 'C') and ((rec[1] == 'A') or (rec[1] == 'G')))
+             or ((rec[0] == 'T') and ((rec[1] == 'A') or (rec[1] == 'G'))))
+
+def calc_titv(rec_list, variant_type='TP'):
+    if variant_type=='TP':
+        new_list = [x for x in rec_list if x[2] and x[3]]
+    elif variant_type=='FP':
+        new_list = [x for x in rec_list if x[2] and not x[3] and x[4]]
+    if variant_type=='FN':
+        new_list = [x for x in rec_list if not x[2] and x[3]]
+    ti = np.count_nonzero([is_transition(rec) for rec in new_list])
+    tv = np.count_nonzero([is_transversion(rec) for rec in new_list])
+    if tv == 0:
+        titv = 0.0
+    else:
+        titv = 1.0*ti/tv
+#     print(ti, tv, titv)
+    return(titv)
+
+# <codecell>
+
+def calc_variant_summary_table(isolate_code='7G8', min_Truth_distance_nearest=0, min_VQSLOD=-99999):
     aggregation = collections.OrderedDict()
     aggregation['#Truth'] = 'IsInTruth', sum
     aggregation['#GATK'] = 'IsInGATK', sum
@@ -404,32 +475,298 @@ def calc_variant_summary_table(isolate_code='7G8', min_Truth_distance_nearest=0)
     aggregation['#TP'] = ('IsInGATK', 'IsInTruth'), lambda rec: np.sum([x[0] and x[1] for x in list(rec)])
     aggregation['#FP'] = ('IsInGATK', 'IsInTruth', 'IsAccessible'), lambda rec: np.sum([x[0] and not x[1] and x[2] for x in list(rec)])
     aggregation['#FN'] = ('IsInGATK', 'IsInTruth'), lambda rec: np.sum([not x[0] and x[1] for x in list(rec)])
+    aggregation['TiTv TP'] = ('REF', 'ALT', 'IsInGATK', 'IsInTruth', 'IsAccessible'), lambda rec: calc_titv(list(rec), 'TP')
+    aggregation['TiTv FP'] = ('REF', 'ALT', 'IsInGATK', 'IsInTruth', 'IsAccessible'), lambda rec: calc_titv(list(rec), 'FP')
+    aggregation['TiTv FN'] = ('REF', 'ALT', 'IsInGATK', 'IsInTruth', 'IsAccessible'), lambda rec: calc_titv(list(rec), 'FN')
+    aggregation['#TPmod3'] = ('REF', 'ALT', 'IsInGATK', 'IsInTruth'), lambda rec: np.sum([(len(x[0]) - len(x[1])) % 3 == 0 and x[2] and x[3] for x in list(rec)])
+    aggregation['#FPmod3'] = ('REF', 'ALT', 'IsInGATK', 'IsInTruth', 'IsAccessible'), lambda rec: np.sum([(len(x[0]) - len(x[1])) % 3 == 0 and x[2] and not x[3] and x[4] for x in list(rec)])
+    aggregation['#FNmod3'] = ('REF', 'ALT', 'IsInGATK', 'IsInTruth'), lambda rec: np.sum([(len(x[0]) - len(x[1])) % 3 == 0 and not x[2] and x[3] for x in list(rec)])
 
     tbl_variant_summary = (tbl_whole_genome_comparisons[isolate_code]
         .select(lambda rec: rec['Truth_distance_nearest'] is None or rec['Truth_distance_nearest'] >= min_Truth_distance_nearest)
+        .select(lambda rec: rec['VQSLOD'] is None or rec['VQSLOD'] >= min_VQSLOD)
         .aggregate(('RegionType', 'IsCoding', 'mode'), aggregation)
-        .convertnumbers()
+#         .convertnumbers()
         .addfield('Unfilt sensitivity', lambda rec: 0.0 if rec['#Truth'] == 0 else round(rec['#TP'] / rec['#Truth'], 3))
         .addfield('Unfilt FDR', lambda rec: 0.0 if rec['#GATK accessible'] == 0 else round(rec['#FP'] / rec['#GATK accessible'], 3))
+        .addfield('%TPmod3', lambda rec: 0.0 if rec['#TP'] == 0 else round(rec['#TPmod3'] / rec['#TP'], 3))
+        .addfield('%FPmod3', lambda rec: 0.0 if rec['#FP'] == 0 else round(rec['#FPmod3'] / rec['#FP'], 3))
+        .addfield('%FNmod3', lambda rec: 0.0 if rec['#FN'] == 0 else round(rec['#FNmod3'] / rec['#FN'], 3))
     )
     
     return(tbl_variant_summary)
 
 # <codecell>
 
-rewrite=True
+calc_variant_summary_table().displayall()
+
+# <codecell>
+
+rewrite=False
 
 tbl_variant_summary = collections.OrderedDict()
 for isolate_code in isolate_codes:
     tbl_variant_summary[isolate_code] = collections.OrderedDict()
     for min_Truth_distance_nearest in [0, 10, 100]:
-        print(isolate_code, min_Truth_distance_nearest)
-        tbl_variant_summary_cache_fn = os.path.join(CACHE_DIR, 'tbl_comparison', "tbl_variant_summary_%s_%d" % (isolate_code, min_Truth_distance_nearest))
-        if not os.path.exists(tbl_variant_summary_cache_fn) or rewrite:
-            tbl_variant_summary[isolate_code][str(min_Truth_distance_nearest)] = calc_variant_summary_table(isolate_code, min_Truth_distance_nearest)
-            etl.topickle(tbl_variant_summary[isolate_code][str(min_Truth_distance_nearest)], tbl_variant_summary_cache_fn)
+#     for min_Truth_distance_nearest in [0]:
+        tbl_variant_summary[isolate_code][str(min_Truth_distance_nearest)] = collections.OrderedDict()
+        for min_VQSLOD in [-99999, 0, 2, 6]:
+            print(isolate_code, min_Truth_distance_nearest, min_VQSLOD)
+            tbl_variant_summary_cache_fn = os.path.join(CACHE_DIR, 'tbl_comparison', "tbl_variant_summary_%s_%d_%d" % (isolate_code, min_Truth_distance_nearest, min_VQSLOD))
+            if not os.path.exists(tbl_variant_summary_cache_fn) or rewrite:
+                tbl_variant_summary[isolate_code][str(min_Truth_distance_nearest)][str(min_VQSLOD)] = calc_variant_summary_table(isolate_code, min_Truth_distance_nearest, min_VQSLOD)
+                etl.topickle(tbl_variant_summary[isolate_code][str(min_Truth_distance_nearest)][str(min_VQSLOD)], tbl_variant_summary_cache_fn)
+            else:
+                tbl_variant_summary[isolate_code][str(min_Truth_distance_nearest)][str(min_VQSLOD)] = etl.frompickle(tbl_variant_summary_cache_fn)
+
+# <codecell>
+
+rewrite = False
+
+aggregation_allsamples = collections.OrderedDict()
+aggregation_allsamples['#Truth'] = '#Truth', sum
+aggregation_allsamples['#GATK'] = '#GATK', sum
+aggregation_allsamples['#GATK accessible'] = '#GATK accessible', sum
+aggregation_allsamples['#TP'] = '#TP', sum
+aggregation_allsamples['#FP'] = '#FP', sum
+aggregation_allsamples['#FN'] = '#FN', sum
+aggregation_allsamples['#TPmod3'] = '#TPmod3', sum
+aggregation_allsamples['#FPmod3'] = '#FPmod3', sum
+aggregation_allsamples['#FNmod3'] = '#FNmod3', sum
+
+tbl_allsamples_summary = collections.OrderedDict()
+for min_Truth_distance_nearest in [0, 10, 100]:
+# for min_Truth_distance_nearest in [0]:
+    print(min_Truth_distance_nearest)
+    tbl_allsamples_summary_cache_fn = os.path.join(CACHE_DIR, 'tbl_comparison', "tbl_allsamples_summary_%d" % (min_Truth_distance_nearest))
+    if not os.path.exists(tbl_variant_summary_cache_fn) or rewrite:
+        tbl_allsamples_summary[str(min_Truth_distance_nearest)] = (
+            tbl_variant_summary['7G8'][str(min_Truth_distance_nearest)]
+            .cat(tbl_variant_summary['GB4'][str(min_Truth_distance_nearest)])
+            .cat(tbl_variant_summary['KE01'][str(min_Truth_distance_nearest)])
+            .cat(tbl_variant_summary['KH02'][str(min_Truth_distance_nearest)])
+            .cat(tbl_variant_summary['GN01'][str(min_Truth_distance_nearest)])
+            .update('IsCoding', 'Coding', where=lambda rec: rec['IsCoding'] == 1)
+            .update('IsCoding', 'Non-coding', where=lambda rec: rec['IsCoding'] != 'Coding')
+            .aggregate(('RegionType', 'IsCoding', 'mode'), aggregation_allsamples)
+            .convertnumbers()
+            .addfield('Unfilt sensitivity', lambda rec: 0.0 if rec['#Truth'] == 0 else round(rec['#TP'] / rec['#Truth'], 3))
+            .addfield('Unfilt FDR', lambda rec: 0.0 if rec['#GATK accessible'] == 0 else round(rec['#FP'] / rec['#GATK accessible'], 3))
+            .addfield('%TPmod3', lambda rec: 0.0 if rec['#TP'] == 0 else round(rec['#TPmod3'] / rec['#TP'], 3))
+            .addfield('%FPmod3', lambda rec: 0.0 if rec['#FP'] == 0 else round(rec['#FPmod3'] / rec['#FP'], 3))
+            .addfield('%FNmod3', lambda rec: 0.0 if rec['#FN'] == 0 else round(rec['#FNmod3'] / rec['#FN'], 3))
+            .sort('Unfilt sensitivity', reverse=True)
+        )
+        etl.topickle(tbl_allsamples_summary[str(min_Truth_distance_nearest)], tbl_allsamples_summary_cache_fn)
+    else:
+        tbl_allsamples_summary[str(min_Truth_distance_nearest)] = etl.frompickle(tbl_allsamples_summary_cache_fn)
+
+# <codecell>
+
+rewrite = True
+
+aggregation_allsamples = collections.OrderedDict()
+aggregation_allsamples['#Truth'] = '#Truth', sum
+aggregation_allsamples['#GATK'] = '#GATK', sum
+aggregation_allsamples['#GATK accessible'] = '#GATK accessible', sum
+aggregation_allsamples['#TP'] = '#TP', sum
+aggregation_allsamples['#FP'] = '#FP', sum
+aggregation_allsamples['#FN'] = '#FN', sum
+# aggregation_allsamples['TiTv TP'] = 'TiTv TP', np.nanmean
+# aggregation_allsamples['TiTv FP'] = 'TiTv FP', np.nanmean
+# aggregation_allsamples['TiTv FN'] = 'TiTv FN', np.nanmean
+aggregation_allsamples['#TPmod3'] = '#TPmod3', sum
+aggregation_allsamples['#FPmod3'] = '#FPmod3', sum
+aggregation_allsamples['#FNmod3'] = '#FNmod3', sum
+
+tbl_allsamples_filtered_summary = collections.OrderedDict()
+# for min_Truth_distance_nearest in [0, 10, 100]:
+for min_Truth_distance_nearest in [0]:
+    tbl_allsamples_filtered_summary[str(min_Truth_distance_nearest)] = collections.OrderedDict()
+    for min_VQSLOD in [-99999, 0, 2, 6]:
+        print(min_Truth_distance_nearest, min_VQSLOD)
+#         tbl_allsamples_filtered_summary[str(min_Truth_distance_nearest)] = collections.OrderedDict()
+        tbl_allsamples_filtered_summary_cache_fn = os.path.join(CACHE_DIR, 'tbl_comparison', "tbl_allsamples_filtered_summary_%d_%d" % (min_Truth_distance_nearest, min_VQSLOD))
+        if not os.path.exists(tbl_allsamples_filtered_summary_cache_fn) or rewrite:
+            tbl_allsamples_filtered_summary[str(min_Truth_distance_nearest)][str(min_VQSLOD)] = (
+                tbl_variant_summary['7G8'][str(min_Truth_distance_nearest)][str(min_VQSLOD)]
+                .cat(tbl_variant_summary['GB4'][str(min_Truth_distance_nearest)][str(min_VQSLOD)])
+                .cat(tbl_variant_summary['KE01'][str(min_Truth_distance_nearest)][str(min_VQSLOD)])
+                .cat(tbl_variant_summary['KH02'][str(min_Truth_distance_nearest)][str(min_VQSLOD)])
+                .cat(tbl_variant_summary['GN01'][str(min_Truth_distance_nearest)][str(min_VQSLOD)])
+#                 .select(lambda rec: rec['VQSLOD'] is None or rec['VQSLOD'] >= VQSLOD_threshold)
+                .update('IsCoding', 'Coding', where=lambda rec: rec['IsCoding'] == 1)
+                .update('IsCoding', 'Non-coding', where=lambda rec: rec['IsCoding'] != 'Coding')
+                .aggregate(('RegionType', 'IsCoding', 'mode'), aggregation_allsamples)
+                .convertnumbers()
+                .addfield('Unfilt sensitivity', lambda rec: 0.0 if rec['#Truth'] == 0 else round(rec['#TP'] / rec['#Truth'], 3))
+                .addfield('Unfilt FDR', lambda rec: 0.0 if rec['#GATK accessible'] == 0 else round(rec['#FP'] / rec['#GATK accessible'], 3))
+                .addfield('%TPmod3', lambda rec: 0.0 if rec['#TP'] == 0 else round(rec['#TPmod3'] / rec['#TP'], 3))
+                .addfield('%FPmod3', lambda rec: 0.0 if rec['#FP'] == 0 else round(rec['#FPmod3'] / rec['#FP'], 3))
+                .addfield('%FNmod3', lambda rec: 0.0 if rec['#FN'] == 0 else round(rec['#FNmod3'] / rec['#FN'], 3))
+                .sort('Unfilt sensitivity', reverse=True)
+            )
+            etl.topickle(tbl_allsamples_filtered_summary[str(min_Truth_distance_nearest)][str(min_VQSLOD)], tbl_allsamples_filtered_summary_cache_fn)
         else:
-            tbl_variant_summary[isolate_code][str(min_Truth_distance_nearest)] = etl.frompickle(tbl_variant_summary_cache_fn)
+            tbl_allsamples_filtered_summary[str(min_Truth_distance_nearest)][str(min_VQSLOD)] = etl.frompickle(tbl_allsamples_filtered_summary_cache_fn)
+
+# <codecell>
+
+tbl_allsamples_filtered_summary['0']['-99999'].selecteq('RegionType', 'Core')
+
+# <codecell>
+
+tbl_allsamples_filtered_summary['0']['2'].selecteq('RegionType', 'Core')
+
+# <codecell>
+
+list(tbl_allsamples_filtered_summary['0'].keys())
+
+# <codecell>
+
+# tbl_variant_summary['7G8']['0']
+
+# <codecell>
+
+tbl_variant_summary['7G8']['0']['-99999'].selecteq('RegionType', 'Core').displayall()
+
+# <codecell>
+
+tbl_variant_summary['7G8']['0']['0'].selecteq('RegionType', 'Core').displayall()
+
+# <codecell>
+
+tbl_variant_summary['7G8']['0']['2'].selecteq('RegionType', 'Core').displayall()
+
+# <codecell>
+
+tbl_variant_summary['7G8']['0']['6'].selecteq('RegionType', 'Core').displayall()
+
+# <codecell>
+
+tbl_allsamples_summary['0'].selecteq('RegionType', 'Core').selecteq('mode', 'INDEL')
+
+# <codecell>
+
+for min_Truth_distance_nearest in [0, 10, 100]:
+    (tbl_allsamples_summary[str(min_Truth_distance_nearest)]
+        .selecteq('RegionType', 'Core')
+        .selecteq('mode', 'INDEL')
+        .cut(['IsCoding', '#TP', '#FP', '#FN'])
+        .melt('IsCoding')
+        .rename('variable', 'Variant set')
+        .convert('Variant set', lambda val: val[1:])
+        .rename('value', '# variants')
+    ).annex(tbl_allsamples_summary[str(min_Truth_distance_nearest)]
+        .selecteq('RegionType', 'Core')
+        .selecteq('mode', 'INDEL')
+        .cut(['IsCoding', '#TPmod3', '#FPmod3', '#FNmod3'])
+        .melt('IsCoding')
+        .cut('value')
+        .rename('value', '# mod 3')
+    ).annex(tbl_allsamples_summary[str(min_Truth_distance_nearest)]
+        .selecteq('RegionType', 'Core')
+        .selecteq('mode', 'INDEL')
+        .cut(['IsCoding', '%TPmod3', '%FPmod3', '%FNmod3'])
+        .melt('IsCoding')
+        .cut('value')
+        .rename('value', '% mod 3')
+    ).sort('IsCoding').toxlsx("%s/mod3_indels_Core_%d.xlsx" % (PLOTS_DIR, min_Truth_distance_nearest))
+
+
+# <codecell>
+
+df_variant_summary = collections.OrderedDict()
+for min_Truth_distance_nearest in [0, 10, 100]:
+    df_variant_summary[str(min_Truth_distance_nearest)] = (
+        tbl_variant_summary['7G8'][str(min_Truth_distance_nearest)].addfield('Sample', '7G8')
+        .cat(tbl_variant_summary['GB4'][str(min_Truth_distance_nearest)].addfield('Sample', 'GB4'))
+        .cat(tbl_variant_summary['KE01'][str(min_Truth_distance_nearest)].addfield('Sample', 'KE01'))
+        .cat(tbl_variant_summary['KH02'][str(min_Truth_distance_nearest)].addfield('Sample', 'KH02'))
+        .cat(tbl_variant_summary['GN01'][str(min_Truth_distance_nearest)].addfield('Sample', 'GN01'))
+        .selecteq('RegionType', 'Core')
+        .selectin('IsCoding', [0, 1])
+        .update('IsCoding', 'Coding', where=lambda rec: rec['IsCoding'] == 1)
+        .update('IsCoding', 'Non-coding', where=lambda rec: rec['IsCoding'] != 'Coding')
+        .addfield('Variant type', lambda rec: "%s %s" % (rec['IsCoding'], rec['mode']))
+        .sort('IsCoding')
+        .sort('mode', reverse=True)
+        .todataframe()
+    )
+
+# <codecell>
+
+for min_Truth_distance_nearest in [0, 10, 100]:
+    fig = figure(figsize=(8, 6))
+    ax = fig.add_subplot(2, 1, 1)
+    g = sns.barplot(x="Variant type", y="Unfilt sensitivity", hue="Sample", ci=None,
+                    data=df_variant_summary[str(min_Truth_distance_nearest)])
+    g.legend(loc="lower center")
+    g.set_ylabel("Unfiltered sensitivity")
+    g.set_xlabel("")
+    ax = fig.add_subplot(2, 1, 2)
+    g = sns.barplot(x="Variant type", y="Unfilt FDR", hue="Sample", ci=None,
+                    data=df_variant_summary[str(min_Truth_distance_nearest)])
+    g.legend(loc="lower center")
+    g.set_ylabel("Unfiltered FDR")
+    g.set_xlabel("")
+    fig.tight_layout()
+
+# <codecell>
+
+tbl_variant_summary['7G8']['0'].selecteq('RegionType', 'Core')
+
+# <codecell>
+
+tbl_variant_summary['7G8']['0']
+
+# <codecell>
+
+for min_Truth_distance_nearest in [0, 10, 100]:
+    (tbl_allsamples_summary[str(min_Truth_distance_nearest)]
+        .selecteq('RegionType', 'Core')
+        .cutout('RegionType')
+        .sort('IsCoding')
+        .sort('mode', reverse=True)
+        .cut([0, 1, 2, 3, 4, 5, 6, 7, 11, 12])
+    #     .displayall()
+        .toxlsx("%s/all_samples_summary_Core_%d.xlsx" % (PLOTS_DIR, min_Truth_distance_nearest))
+    )
+
+# <codecell>
+
+# for min_Truth_distance_nearest in [0, 10, 100]:
+for min_Truth_distance_nearest in [0]:
+    for min_VQSLOD in [-99999, 0, 2, 6]:
+        (tbl_allsamples_filtered_summary[str(min_Truth_distance_nearest)][str(min_VQSLOD)]
+            .selecteq('RegionType', 'Core')
+            .cutout('RegionType')
+            .sort('IsCoding')
+            .sort('mode', reverse=True)
+            .cut([0, 1, 2, 3, 4, 5, 6, 7, 11, 12])
+        #     .displayall()
+            .toxlsx("%s/tbl_allsamples_filtered_summary_Core_%d_%d.xlsx" % (PLOTS_DIR, min_Truth_distance_nearest, min_VQSLOD))
+        )
+
+# <codecell>
+
+(tbl_allsamples_summary['10']
+    .selecteq('RegionType', 'Core')
+    .cutout('RegionType')
+    .sort('IsCoding')
+    .sort('mode', reverse=True)
+    .displayall()
+)
+
+# <codecell>
+
+(tbl_allsamples_summary['100']
+    .selecteq('RegionType', 'Core')
+    .cutout('RegionType')
+    .sort('IsCoding')
+    .sort('mode', reverse=True)
+    .displayall()
+)
 
 # <codecell>
 
@@ -463,14 +800,204 @@ for isolate_code in isolate_codes:
     .displayall()
 )
 
+# <codecell>
+
+
+# <codecell>
+
+isolate_code = '7G8'
+mode = 'SNP'
+RegionType = 'Core'
+IsCoding = True
+
+df_vqslod_gt = collections.OrderedDict()
+for isolate_code in isolate_codes:
+    df_vqslod_gt[isolate_code] = collections.OrderedDict()
+    for mode in ['SNP', 'INDEL']:
+        df_vqslod_gt[isolate_code][mode] = collections.OrderedDict()
+        for IsCoding in [True, False]:
+            df_vqslod_gt[isolate_code][mode][IsCoding] = (tbl_whole_genome_comparisons[isolate_code]
+                .selecteq('IsInGATK', True)
+                .selecteq('mode', mode)
+                .selecteq('RegionType', RegionType)
+                .selecteq('IsCoding', IsCoding)
+                .selecteq('IsAccessible', True)
+                .addfield('call_type', lambda rec: 'Hom' if rec['GT'][0] == rec['GT'][2] else 'Het')
+                .selectge('VQSLOD', -20)
+                .selectle('VQSLOD', 20)
+                .cut(['VQSLOD', 'call_type', 'GT'])
+            ).todataframe()
+
+# <codecell>
+
+(tbl_whole_genome_comparisons[isolate_code]
+    .selecteq('IsInGATK', True)
+    .selecteq('mode', mode)
+    .selecteq('RegionType', RegionType)
+    .selecteq('IsCoding', IsCoding)
+    .selecteq('IsAccessible', True)
+    .addfield('call_type', lambda rec: 'Hom' if rec['GT'][0] == rec['GT'][2] else 'Het')
+    .valuecounts('GT')
+    .displayall()
+)
+(tbl_whole_genome_comparisons[isolate_code]
+    .selecteq('IsInGATK', True)
+    .selecteq('mode', mode)
+    .selecteq('RegionType', RegionType)
+    .selecteq('IsCoding', IsCoding)
+    .selecteq('IsAccessible', True)
+    .addfield('call_type', lambda rec: 'Hom' if rec['GT'][0] == rec['GT'][2] else 'Het')
+    .valuecounts('call_type')
+    .displayall()
+)
+(tbl_whole_genome_comparisons[isolate_code]
+    .selecteq('IsInGATK', True)
+    .selecteq('mode', mode)
+    .selecteq('RegionType', RegionType)
+    .selecteq('IsCoding', IsCoding)
+    .selecteq('IsAccessible', True)
+    .addfield('VQSLODgt8', lambda rec: rec['VQSLOD'] >= 8.0)
+    .valuecounts('VQSLODgt8')
+    .displayall()
+)
+
+# <codecell>
+
+upper_limit={'SNP':8, 'INDEL':4}
+lower_limit={'SNP':2, 'INDEL':2}
+
+for i, mode in enumerate(['SNP', 'INDEL']):
+    for j, IsCoding in enumerate([True, False]):
+        fig = figure(figsize=(8, 4))
+        for k, isolate_code in enumerate(isolate_codes):
+            ax = fig.add_subplot(1, 5, k+1)
+            g = sns.violinplot(x="call_type", y="VQSLOD", data=df_vqslod_gt[isolate_code][mode][IsCoding], ax=ax)
+            ax.set_ylim([-15, 15])
+            ax.set_title(isolate_code)
+            ax.axhline(upper_limit[mode], color='green')
+            ax.axhline(lower_limit[mode], color='red')
+        fig.tight_layout()
+
+
 # <headingcell level=1>
 
 # Plot ROC curves
 
 # <codecell>
 
+fig = figure(figsize=(6, 6))
+ax = fig.add_subplot(1, 1, 1)
 for isolate_code in isolate_codes:
-    plotROC(isolate_code)
+    if isolate_code=='KE01':
+        show_annotations=True
+    else:
+        show_annotations=False
+    ax = plotROC(isolate_code, show_annotations=show_annotations, xmax=0.15, ax=ax)
+    ax.legend(loc="lower right")
+
+# <codecell>
+
+fig = figure(figsize=(6, 6))
+ax = fig.add_subplot(1, 1, 1)
+for isolate_code in isolate_codes:
+    if isolate_code=='KE01':
+        show_annotations=True
+    else:
+        show_annotations=False
+    ax = plotROC(isolate_code, show_annotations=show_annotations, min_Truth_distance_nearest=10, min_GATK_distance_nearest=10,
+                 xmax=0.15, ax=ax)
+    ax.legend(loc="lower right")
+
+# <codecell>
+
+fig = figure(figsize=(6, 6))
+ax = fig.add_subplot(1, 1, 1)
+for isolate_code in isolate_codes:
+    if isolate_code=='KE01':
+        show_annotations=True
+    else:
+        show_annotations=False
+    ax = plotROC(isolate_code, show_annotations=show_annotations, min_Truth_distance_nearest=100, min_GATK_distance_nearest=100,
+                 xmax=0.15, ax=ax)
+    ax.legend(loc="lower right")
+
+# <codecell>
+
+fig = figure(figsize=(6, 6))
+ax = fig.add_subplot(1, 1, 1)
+for isolate_code in isolate_codes:
+    if isolate_code=='KE01':
+        show_annotations=True
+    else:
+        show_annotations=False
+    ax = plotROC(isolate_code, show_annotations=show_annotations, IsCoding=False, ax=ax)
+    ax.legend(loc="lower right")
+
+# <codecell>
+
+fig = figure(figsize=(6, 6))
+ax = fig.add_subplot(1, 1, 1)
+for isolate_code in isolate_codes:
+    if isolate_code=='KE01':
+        show_annotations=True
+    else:
+        show_annotations=False
+    ax = plotROC(isolate_code, show_annotations=show_annotations,
+                 min_Truth_distance_nearest=100, min_GATK_distance_nearest=100,
+                 xmax=0.45, IsCoding=False, ax=ax)
+    ax.legend(loc="lower right")
+
+# <codecell>
+
+fig = figure(figsize=(6, 6))
+ax = fig.add_subplot(1, 1, 1)
+for isolate_code in isolate_codes:
+    if isolate_code=='KE01':
+        show_annotations=True
+    else:
+        show_annotations=False
+    ax = plotROC(isolate_code, show_annotations=show_annotations, mode='INDEL', IsCoding=True, ax=ax)
+    ax.legend(loc="lower right")
+
+# <codecell>
+
+fig = figure(figsize=(6, 6))
+ax = fig.add_subplot(1, 1, 1)
+for isolate_code in isolate_codes:
+    if isolate_code=='KE01':
+        show_annotations=True
+    else:
+        show_annotations=False
+    ax = plotROC(isolate_code, show_annotations=show_annotations,
+                 min_Truth_distance_nearest=100, min_GATK_distance_nearest=100,
+                 xmax=0.40, mode='INDEL', IsCoding=True, ax=ax)
+    ax.legend(loc="lower right")
+
+# <codecell>
+
+fig = figure(figsize=(6, 6))
+ax = fig.add_subplot(1, 1, 1)
+for isolate_code in isolate_codes:
+    if isolate_code=='KE01':
+        show_annotations=True
+    else:
+        show_annotations=False
+    ax = plotROC(isolate_code, show_annotations=show_annotations, mode='INDEL', IsCoding=False, ax=ax)
+    ax.legend(loc="lower right")
+
+# <codecell>
+
+fig = figure(figsize=(6, 6))
+ax = fig.add_subplot(1, 1, 1)
+for isolate_code in isolate_codes:
+    if isolate_code=='KE01':
+        show_annotations=True
+    else:
+        show_annotations=False
+    ax = plotROC(isolate_code, show_annotations=show_annotations,
+                 min_Truth_distance_nearest=100, min_GATK_distance_nearest=100,
+                 xmax=0.35, mode='INDEL', IsCoding=False, ax=ax)
+    ax.legend(loc="lower right")
 
 # <codecell>
 

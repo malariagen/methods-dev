@@ -8,6 +8,7 @@
 # <codecell>
 
 %run standard_imports.ipynb
+%run plotting_setup.ipynb
 
 # <headingcell level=1>
 
@@ -52,6 +53,10 @@ gatk_exe = 'java -jar ' + gatk_dir + '/GenomeAnalysisTK.jar'
 
 snpeff_dir = install_dir + '/snpeff/snpEff'
 snpeff_exe = 'java -jar ' + snpeff_dir + '/snpEff.jar'
+
+# <codecell>
+
+samtools_exe
 
 # <headingcell level=1>
 
