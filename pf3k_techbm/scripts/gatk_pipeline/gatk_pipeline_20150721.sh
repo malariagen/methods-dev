@@ -85,7 +85,7 @@ if [ ! -f ${SAMTOOLS_EXE} ]; then
     mkdir -p ${OPT_DIR}/samtools
     cd ${OPT_DIR}/samtools
     wget http://downloads.sourceforge.net/project/samtools/samtools/${SAMTOOLS_VERSION}/samtools-${SAMTOOLS_VERSION}.tar.bz2
-    tar xzf samtools-${SAMTOOLS_VERSION}.tar.bz2
+    tar xjf samtools-${SAMTOOLS_VERSION}.tar.bz2
     cd samtools-${SAMTOOLS_VERSION}
 	make 2> /dev/null
     cd ${ORIGINAL_DIR}
