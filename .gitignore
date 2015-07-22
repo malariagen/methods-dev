@@ -49,3 +49,6 @@ opt
 pf3k_techbm/opt
 recon/opt
 
+# data
+*.bam
+
