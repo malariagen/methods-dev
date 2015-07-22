@@ -15,9 +15,9 @@
 ################################################################################
 
 
-# catch errors
-set -e
-set -o pipefail
+# # catch errors
+# set -e
+# set -o pipefail
 
 # directories
 export ORIGINAL_DIR=`pwd`
