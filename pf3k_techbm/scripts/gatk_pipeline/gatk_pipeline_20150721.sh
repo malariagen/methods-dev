@@ -153,7 +153,7 @@ fi
 ################################################################################
 
 # Shuffle sample manifest
-if [ ! -s ${SHUFFLED_SAMPLE_MANIFEST}]; then
+if [ ! -s ${SHUFFLED_SAMPLE_MANIFEST} ]; then
     shuf ${SAMPLE_MANIFEST} > ${SHUFFLED_SAMPLE_MANIFEST}
 fi
 
