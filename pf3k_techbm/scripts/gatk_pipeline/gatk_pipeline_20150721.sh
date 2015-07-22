@@ -142,14 +142,14 @@ do
     original_bam_fn=`awk "NR==$i" ${SAMPLE_MANIFEST} | cut -f2`
     bwa_mem_fn="${PROCESSED_DATA_DIR}/bams/bwa_mem/${sample_name}.bwa_mem.sam"
     read_group_info=`get_RG ${original_bam_fn}`
-    echo sample_name ${read_group_info}
+    echo ${sample_name} ${original_bam_fn} ${read_group_info}
     if [ ! -f ${bwa_mem_fn} ]; then
         if [[ "${original_bam_fn}" == *.bam ]]; then
-            ${SAMTOOLS_EXE} bamshuf -uOn 128 ${original_bam_fn} tmp | \
+            ${SAMTOOLS_EXE} bamshuf -uOn 128 "${original_bam_fn}" tmp | \
             ${SAMTOOLS_EXE} bam2fq - | \
             ${BWA_EXE} mem -M -R '${read_group_info}' -p ${REF_GENOME} - > ${bwa_mem_fn} 2> /dev/null
         elif [[ "${original_bam_fn}" == *.cram ]]; then
-            ${SAMTOOLS_EXE} view -b ${original_bam_fn} | \
+            ${SAMTOOLS_EXE} view -b "${original_bam_fn}" | \
             ${SAMTOOLS_EXE} bamshuf -uOn 128 - tmp | \
             ${SAMTOOLS_EXE} bam2fq - | \
             ${FIRST_LAST_100BP_EXE} - | \
