@@ -1,0 +1,5 @@
+7G8	/nfs/team112_internal/production_files/Pf/4_0/PFprog3/PG0083_C/PG0083_C.bam
+GB4	/nfs/team112_internal/production_files/Pf/4_0/PFprog3/PG0084_C/PG0084_C.bam
+KE01	/nfs/pathogen003/tdo/Pfalciparum/PF3K/Reference12Genomes/Sharing_25Jun2015/cram/16503_1#3.cram
+KH02	/nfs/pathogen003/tdo/Pfalciparum/PF3K/Reference12Genomes/Sharing_25Jun2015/cram/16503_1#2.cram
+GN01	/nfs/pathogen003/tdo/Pfalciparum/PF3K/Reference12Genomes/Sharing_25Jun2015/cram/16503_1#6.cram
