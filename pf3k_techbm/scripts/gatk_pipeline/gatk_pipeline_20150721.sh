@@ -133,7 +133,7 @@ fi
 # Run pipeline
 ################################################################################
 
-number_of_samples=`wc -l ${SAMPLE_MANIFEST}`
+number_of_samples=$(wc -l < ${SAMPLE_MANIFEST})
 
 # Remap with bwa mem, including subsetting 250bp reads to 100bp and converting cram
 for (( i=1; i<=${number_of_samples}; i++ ));
