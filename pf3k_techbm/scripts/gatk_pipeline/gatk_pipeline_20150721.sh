@@ -183,13 +183,13 @@ do
             ${SAMTOOLS_EXE} view -b "${original_bam_fn}" | \
             ${SAMTOOLS_EXE} bamshuf -uOn 128 - tmp | \
             ${SAMTOOLS_EXE} bam2fq - | \
-            # ${FIRST_LAST_100BP_EXE} - | \
+            ${FIRST_LAST_100BP_EXE} - | \
             ${BWA_EXE} mem -M -R ${read_group_info} -p ${REF_GENOME} - > ${bwa_mem_fn}
-            # ${FIRST_LAST_100BP_EXE} - > ${bwa_mem_fn}
-            # 2> /dev/null
         fi
     fi
 done
+# ${FIRST_LAST_100BP_EXE} - > ${bwa_mem_fn}
+# 2> /dev/null
 
 
 # Sort and mark duplicates
@@ -341,11 +341,11 @@ do
             batch_index=batch_index+1
         fi
         if [ ${position_in_batch} == 1 ]; then
-            gvcf_list_filename = "${PROCESSED_DATA_DIR}/vcfs/gvcf/lists/gvcfs/${chromosome}.${batch_index}.list"
+            gvcf_list_filename="${PROCESSED_DATA_DIR}/vcfs/gvcf/lists/gvcfs/${chromosome}.${batch_index}.list"
             if [ -f ${gvcf_list_filename} ]; then
                 rm ${gvcf_list_filename}
             fi
-            combined_gvcf_fn = "${PROCESSED_DATA_DIR}/gvcf/combined_gvcf/combined.${chromosome}.${batch_index}.g.vcf"
+            combined_gvcf_fn="${PROCESSED_DATA_DIR}/gvcf/combined_gvcf/combined.${chromosome}.${batch_index}.g.vcf"
             echo ${combined_gvcf_fn} >> ${combined_gvcf_list_filename}
         fi
         sample_name=`awk "NR==$sample_index" ${SHUFFLED_SAMPLE_MANIFEST} | cut -f1`
