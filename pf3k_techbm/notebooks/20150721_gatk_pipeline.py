@@ -11,18 +11,7 @@
 
 # <codecell>
 
-# Move files from previous run on all 10 samples
-!mv {os.path.join(PROCESSED_ASSEMBLED_SAMPLES_DIR, 'vcfs', 'gvcf', 'lists')} {os.path.join(PROCESSED_ASSEMBLED_SAMPLES_DIR, 'vcfs', 'gvcf', 'lists_10')}
-!mv {os.path.join(PROCESSED_ASSEMBLED_SAMPLES_DIR, 'vcfs', 'gvcf', 'combined_gvcf')} {os.path.join(PROCESSED_ASSEMBLED_SAMPLES_DIR, 'vcfs', 'gvcf', 'combined_gvcf_10')}
-!mv {os.path.join(PROCESSED_ASSEMBLED_SAMPLES_DIR, 'vcfs', 'vcf')} {os.path.join(PROCESSED_ASSEMBLED_SAMPLES_DIR, 'vcfs', 'vcf_10')}
-
-# <codecell>
-
-!mkdir -p {os.path.join(PROCESSED_ASSEMBLED_SAMPLES_DIR, 'bams', 'bwa_mem')}
-!mkdir -p {os.path.join(PROCESSED_ASSEMBLED_SAMPLES_DIR, 'vcfs', 'gvcf', 'samples')}
-!mkdir -p {os.path.join(PROCESSED_ASSEMBLED_SAMPLES_DIR, 'vcfs', 'gvcf', 'lists')}
-!mkdir -p {os.path.join(PROCESSED_ASSEMBLED_SAMPLES_DIR, 'vcfs', 'gvcf', 'combined_gvcf')}
-!mkdir -p {os.path.join(PROCESSED_ASSEMBLED_SAMPLES_DIR, 'vcfs', 'vcf', 'recal')}
+sample_manifest_fn = '../meta/validation_sample_bams.txt'
 
 # <headingcell level=1>
 
@@ -30,22 +19,17 @@
 
 # <codecell>
 
-def get_RG(bam_fn = '/nfs/team112_internal/production_files/Pf/4_0/PFprog1/PG0008_CW/PG0008_CW.bam'):
-    temp = !{samtools_exe} view -H {bam_fn} | grep '@RG'
-    return(temp[0])
-get_RG()
+tbl_samples_to_process = (tbl_assembled_samples
+    .cutout('Notes')
+    .selectnotnone('bam_fn')
+    .selecteq('To be used for', 'Validation')
+    .cut(['Isolate code', 'bam_fn'])
+)
+tbl_samples_to_process.displayall(index_header=True)
 
 # <codecell>
 
-get_RG('/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/IT/14572_1#34.bam')
-
-# <codecell>
-
-get_RG('/nfs/pathogen003/tdo/Pfalciparum/PF3K/Reference12Genomes/Sharing_25Jun2015/cram/16503_1#1.cram')
-
-# <codecell>
-
-get_RG('/nfs/pathogen003/tdo/Pfalciparum/PF3K/Reference12Genomes/Sharing_25Jun2015/cram/16503_1#4.cram')
+tbl_samples_to_process.data().totsv(sample_manifest_fn)
 
 # <codecell>
 
@@ -82,42 +66,6 @@ tbl_samples_to_process = (tbl_assembled_samples
 #     .head(4)
 )
 tbl_samples_to_process.displayall(index_header=True)
-
-# <codecell>
-
-tbl_samples_to_process.values('bam_fn')[0]
-
-# <headingcell level=1>
-
-# Functions
-
-# <codecell>
-
-%%file first_last_100bp.py
-import sys
-from Bio import SeqIO
-
-iterator = SeqIO.parse(sys.stdin, "fastq")
-
-for firstRead in iterator:
-    firstRead_first100 = firstRead[0:100]
-    firstRead_first100.id = firstRead_first100.id.replace('#', '_first100#')
-    firstRead_first100.description = ''
-    firstRead_last100 = firstRead[150:250]
-    firstRead_last100.id = firstRead_last100.id.replace('#', '_last100#')
-    firstRead_last100.description = ''
-    secondRead = next(iterator)
-    secondRead_first100 = secondRead[0:100]
-    secondRead_first100.id = secondRead_first100.id.replace('#', '_first100#')
-    secondRead_first100.description = ''
-    secondRead_last100 = secondRead[150:250]
-    secondRead_last100.id = secondRead_last100.id.replace('#', '_last100#')
-    secondRead_last100.description = ''
-    SeqIO.write(firstRead_first100, sys.stdout, "fastq")
-    SeqIO.write(secondRead_first100, sys.stdout, "fastq")
-    SeqIO.write(firstRead_last100, sys.stdout, "fastq")
-    SeqIO.write(secondRead_last100, sys.stdout, "fastq")
-
 
 # <codecell>
 
