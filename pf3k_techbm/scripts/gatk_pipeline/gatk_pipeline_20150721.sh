@@ -185,7 +185,7 @@ do
             ${SAMTOOLS_EXE} bamshuf -uOn 128 - tmp | \
             ${SAMTOOLS_EXE} bam2fq - | \
             ${FIRST_LAST_100BP_EXE} - | \
-            ${BWA_EXE} mem -M -R ${read_group_info} -p ${REF_GENOME} - > ${bwa_mem_fn}
+            ${BWA_EXE} mem -M -R '${read_group_info}' -p ${REF_GENOME} - > ${bwa_mem_fn}
         fi
     fi
 done
