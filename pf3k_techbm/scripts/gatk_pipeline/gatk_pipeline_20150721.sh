@@ -14,6 +14,11 @@
 # Set up envirnoment variables
 ################################################################################
 
+
+# catch errors
+set -e
+set -o pipefail
+
 # directories
 export ORIGINAL_DIR=`pwd`
 export PROCESSED_DATA_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/assembled_samples"
@@ -179,7 +184,8 @@ do
             ${SAMTOOLS_EXE} bamshuf -uOn 128 - tmp | \
             ${SAMTOOLS_EXE} bam2fq - | \
             ${FIRST_LAST_100BP_EXE} - | \
-            ${BWA_EXE} mem -M -R ${read_group_info} -p ${REF_GENOME} - > ${bwa_mem_fn} 2> /dev/null
+            ${BWA_EXE} mem -M -R ${read_group_info} -p ${REF_GENOME} - > ${bwa_mem_fn}
+            # 2> /dev/null
         fi
     fi
 done
