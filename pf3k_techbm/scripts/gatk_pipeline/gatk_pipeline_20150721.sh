@@ -142,7 +142,8 @@ do
     original_bam_fn=`awk "NR==$i" ${SAMPLE_MANIFEST} | cut -f2`
     bwa_mem_fn="${PROCESSED_DATA_DIR}/bams/bwa_mem/${sample_name}.bwa_mem.sam"
     read_group_info=`get_RG "${original_bam_fn}"`
-    echo ${sample_name} ${original_bam_fn} ${read_group_info} $bwa_mem_fn
+    echo ${read_group_info}
+    echo ${sample_name} ${original_bam_fn} ${bwa_mem_fn}
     if [ ! -f ${bwa_mem_fn} ]; then
         if [[ "${original_bam_fn}" == *.bam ]]; then
             ${SAMTOOLS_EXE} bamshuf -uOn 128 "${original_bam_fn}" tmp | \
