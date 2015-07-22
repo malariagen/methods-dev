@@ -183,8 +183,9 @@ do
             ${SAMTOOLS_EXE} view -b "${original_bam_fn}" | \
             ${SAMTOOLS_EXE} bamshuf -uOn 128 - tmp | \
             ${SAMTOOLS_EXE} bam2fq - | \
-            ${FIRST_LAST_100BP_EXE} - | \
-            ${BWA_EXE} mem -M -R ${read_group_info} -p ${REF_GENOME} - > ${bwa_mem_fn}
+            # ${FIRST_LAST_100BP_EXE} - | \
+            ${FIRST_LAST_100BP_EXE} - > ${bwa_mem_fn}
+            # ${BWA_EXE} mem -M -R ${read_group_info} -p ${REF_GENOME} - > ${bwa_mem_fn}
             # 2> /dev/null
         fi
     fi
