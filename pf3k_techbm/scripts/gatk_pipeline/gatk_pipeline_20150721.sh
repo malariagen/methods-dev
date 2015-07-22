@@ -23,7 +23,7 @@ set -o pipefail
 export ORIGINAL_DIR=`pwd`
 export PROCESSED_DATA_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/assembled_samples"
 export OPT_DIR="$HOME/src/github/malariagen/methods-dev/pf3k_techbm/opt"
-export CROSSES_DIR='/nfs/team112_internal/oxford_mirror/data/plasmodium/pfalciparum/pf-crosses/data/public/1.0'
+export CROSSES_DIR="/nfs/team112_internal/oxford_mirror/data/plasmodium/pfalciparum/pf-crosses/data/public/1.0"
 
 # parameters
 export MAX_ALTERNATE_ALLELES=2
@@ -38,8 +38,10 @@ export SAMPLE_MANIFEST="$HOME/src/github/malariagen/methods-dev/pf3k_techbm/meta
 export SHUFFLED_SAMPLE_MANIFEST="$HOME/src/github/malariagen/methods-dev/pf3k_techbm/meta/validation_sample_bams_shuffled.txt"
 
 # data files
-export REF_GENOME='/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa'
-export REF_GENOME_INDEX='/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa.fai'
+export REF_GENOME="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa"
+export REF_GENOME_INDEX="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa.fai"
+export SNPEFF_DB="Pf3D7_GeneDB"
+export REGIONS_FN="../../../pf-crosses/meta/regions-20130225.bed.gz"
 
 # software versions
 export PICARD_VERSION="1.136"
@@ -174,23 +176,20 @@ do
     original_bam_fn=`awk "NR==$i" ${SAMPLE_MANIFEST} | cut -f2`
     bwa_mem_fn="${PROCESSED_DATA_DIR}/bams/bwa_mem/${sample_name}.bwa_mem.sam"
     read_group_info=`get_RG "${original_bam_fn}" | sed 's/\t/\\\\t/g'`
-	echo ${read_group_info}
     if [ ! -s ${bwa_mem_fn} ]; then
         if [[ "${original_bam_fn}" == *.bam ]]; then
             ${SAMTOOLS_EXE} bamshuf -uOn 128 "${original_bam_fn}" tmp | \
             ${SAMTOOLS_EXE} bam2fq - | \
-            ${BWA_EXE} mem -M -R ${read_group_info} -p ${REF_GENOME} - > ${bwa_mem_fn} 2> /dev/null
+            ${BWA_EXE} mem -M -R "${read_group_info}" -p ${REF_GENOME} - > ${bwa_mem_fn} 2> /dev/null
         elif [[ "${original_bam_fn}" == *.cram ]]; then
             ${SAMTOOLS_EXE} view -b "${original_bam_fn}" | \
             ${SAMTOOLS_EXE} bamshuf -uOn 128 - tmp | \
             ${SAMTOOLS_EXE} bam2fq - | \
             ${FIRST_LAST_100BP_EXE} - | \
-            ${BWA_EXE} mem -M -R "${read_group_info}" -p ${REF_GENOME} - > ${bwa_mem_fn}
+            ${BWA_EXE} mem -M -R "${read_group_info}" -p ${REF_GENOME} - > ${bwa_mem_fn} 2> /dev/null
         fi
     fi
 done
-# ${FIRST_LAST_100BP_EXE} - > ${bwa_mem_fn}
-# 2> /dev/null
 
 
 # Sort and mark duplicates
@@ -367,6 +366,7 @@ do
             -T GenotypeGVCFs \
             -R ${REF_GENOME} \
             --variant ${combined_gvcf_list_filename} \
+            --max_alternate_alleles ${MAX_ALTERNATE_ALLELES} \
             -o ${genotyped_vcf_fn} 2> /dev/null
     fi
 done
@@ -417,5 +417,118 @@ if [ ! -s ${recal_fn} ]; then
         -tranchesFile ${tranches_fn} 2> /dev/null
 fi
 
+
+# Apply VQSR
+for (( chromosome_index=1; chromosome_index<=${number_of_chromosomes}; chromosome_index++ ));
+do
+    chromosome=`awk "NR==$chromosome_index" ${REF_GENOME_INDEX} | cut -f1`
+    genotyped_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/raw.snps.indels.${chromosome}.vcf"
+    unfiltered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/unfiltered.SNP.${chromosome}.vcf"
+    filtered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.SNP.${chromosome}.vcf"
+	recal_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_SNP.recal"
+	tranches_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_SNP.tranches"
+	if [ ! -s ${unfiltered_vcf_fn} ]; then
+	    ${GATK_EXE} \
+	        -T SelectVariants \
+	        -R ${REF_GENOME} \
+	        -V ${genotyped_vcf_fn} \
+	        -selectType SNP \
+	        -o ${unfiltered_vcf_fn} 2> /dev/null
+	fi
+	if [ ! -s ${filtered_vcf_fn} ]; then
+	    ${GATK_EXE} \
+	        -T ApplyRecalibration \
+	        -R ${REF_GENOME} \
+	        -input ${unfiltered_vcf_fn} \
+	        -tranchesFile ${tranches_fn} \
+	        -recalFile ${recal_fn} \
+	        --ts_filter_level 99.5 \
+	        -mode SNP \
+	        -o ${filtered_vcf_fn} 2> /dev/null
+	fi
+	bgzip -f ${filtered_vcf_fn}
+	tabix -p vcf -f ${filtered_vcf_fn}.gz
+    unfiltered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/unfiltered.INDEL.${chromosome}.vcf"
+    filtered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.INDEL.${chromosome}.vcf"
+	recal_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_INDEL.recal"
+	tranches_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_INDEL.tranches"
+	if [ ! -s ${unfiltered_vcf_fn} ]; then
+	    ${GATK_EXE} \
+	        -T SelectVariants \
+	        -R ${REF_GENOME} \
+	        -V ${genotyped_vcf_fn} \
+	        -selectType INDEL \
+	        -o ${unfiltered_vcf_fn} 2> /dev/null
+	fi
+	if [ ! -s ${filtered_vcf_fn} ]; then
+	    ${GATK_EXE} \
+	        -T ApplyRecalibration \
+	        -R ${REF_GENOME} \
+	        -input ${unfiltered_vcf_fn} \
+	        -tranchesFile ${tranches_fn} \
+	        -recalFile ${recal_fn} \
+	        --ts_filter_level 99.0 \
+	        -mode INDEL \
+	        -o ${filtered_vcf_fn} 2> /dev/null
+	fi
+	bgzip -f ${filtered_vcf_fn}
+	tabix -p vcf -f ${filtered_vcf_fn}.gz
+done
+
+
+# Apply SnpEff
+for (( chromosome_index=1; chromosome_index<=${number_of_chromosomes}; chromosome_index++ ));
+do
+    chromosome=`awk "NR==$chromosome_index" ${REF_GENOME_INDEX} | cut -f1`
+    filtered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.SNP.${chromosome}.vcf"
+    snpeff_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.snpeff.SNP.${chromosome}.vcf"
+    snpeff_annotated_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.snpeff_annotated.SNP.${chromosome}.vcf"
+    annotated_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.annotated.SNP.${chromosome}.vcf"
+	
+	if [ ! -s ${snpeff_vcf_fn} ]; then
+	    ${SNPEFF_EXE} \
+	        -v -o gatk ${SNPEFF_DB} \
+	        ${filtered_vcf_fn} \
+	        -no-downstream \
+	        -no-upstream \
+	        > ${snpeff_vcf_fn} \
+	        2> /dev/null
+	fi
+	if [ ! -s ${snpeff_annotated_vcf_fn} ]; then
+	    ${GATK_EXE} \
+	        -T VariantAnnotator \
+	        -R ${REF_GENOME} \
+	        -A SnpEff \
+	        --variant ${filtered_vcf_fn} \
+	        --snpEffFile ${snpeff_vcf_fn} \
+	        -o ${snpeff_annotated_vcf_fn} \
+	        2> /dev/null
+	fi
+	if [ ! -s ${annotated_vcf_fn} ]; then
+        cat ${snpeff_annotated_vcf_fn} \
+        | vcf-annotate -a {regions_fn} \
+           -d key=INFO,ID=RegionType,Number=1,Type=String,Description='The type of genome region within which the variant is found. SubtelomericRepeat: repetitive regions at the ends of the chromosomes. SubtelomericHypervariable: subtelomeric region of poor conservation between the 3D7 reference genome and other samples. InternalHypervariable: chromosome-internal region of poor conservation between the 3D7 reference genome and other samples. Centromere: start and end coordinates of the centromere genome annotation. Core: everything else.' \
+           -c CHROM,FROM,TO,INFO/RegionType \
+        > {annotated_vcf_fn}
+	    ${GATK_EXE} \
+	        -T VariantAnnotator \
+	        -R ${REF_GENOME} \
+	        -A SnpEff \
+	        --variant ${filtered_vcf_fn} \
+	        --snpEffFile ${snpeff_vcf_fn} \
+	        -o ${snpeff_annotated_vcf_fn} \
+	        2> /dev/null
+	fi
+        
+    if not os.path.isfile(annotated_vcf_fn+'.gz') or rewrite:
+        !cat {snpeff_annotated_vcf_fn} \
+        | vcf-annotate -a ${REGIONS_FN} \
+           -d key=INFO,ID=RegionType,Number=1,Type=String,Description='The type of genome region within which the variant is found. SubtelomericRepeat: repetitive regions at the ends of the chromosomes. SubtelomericHypervariable: subtelomeric region of poor conservation between the 3D7 reference genome and other samples. InternalHypervariable: chromosome-internal region of poor conservation between the 3D7 reference genome and other samples. Centromere: start and end coordinates of the centromere genome annotation. Core: everything else.' \
+           -c CHROM,FROM,TO,INFO/RegionType \
+        > ${annotated_vcf_fn}
+        bgzip -f ${annotated_vcf_fn}
+        tabix -p vcf -f ${annotated_vcf_fn}.gz
+	fi
+done
 
 

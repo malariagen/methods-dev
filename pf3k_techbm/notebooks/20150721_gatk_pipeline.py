@@ -23,7 +23,7 @@ tbl_samples_to_process = (tbl_assembled_samples
     .cutout('Notes')
     .selectnotnone('bam_fn')
     .selecteq('To be used for', 'Validation')
-    .cut(['Isolate code', 'bam_fn', 'Continent'])
+#     .cut(['Isolate code', 'bam_fn', 'Continent'])
 )
 tbl_samples_to_process.displayall(index_header=True)
 
