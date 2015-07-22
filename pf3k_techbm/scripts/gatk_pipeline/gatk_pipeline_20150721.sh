@@ -141,7 +141,7 @@ do
     sample_name=`awk "NR==$i" ${SAMPLE_MANIFEST} | cut -f1`
     original_bam_fn=`awk "NR==$i" ${SAMPLE_MANIFEST} | cut -f2`
     bwa_mem_fn="${PROCESSED_DATA_DIR}/bams/bwa_mem/${sample_name}.bwa_mem.sam"
-    read_group_info=`get_RG ${original_bam_fn}`
+    read_group_info=`get_RG "${original_bam_fn}"`
     echo ${sample_name} ${original_bam_fn} ${read_group_info}
     if [ ! -f ${bwa_mem_fn} ]; then
         if [[ "${original_bam_fn}" == *.bam ]]; then
