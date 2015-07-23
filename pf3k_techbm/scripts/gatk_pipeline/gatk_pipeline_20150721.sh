@@ -141,9 +141,9 @@ fi
 # Download reference and create SnpEff database
 ################################################################################
 
-ftp://ftp.sanger.ac.uk/pub/project/pathogens/gff3/2015-07/Pfalciparum.genome.fasta.gz
-
-sed -n '/>PF_apicoplast_genome_1/,$ p' /nfs/pathogen003/tdo/Pfalciparum/3D7/Reference/Oct2011/Pf3D7_v3.fasta
+# ftp://ftp.sanger.ac.uk/pub/project/pathogens/gff3/2015-07/Pfalciparum.genome.fasta.gz
+#
+# sed -n '/>PF_apicoplast_genome_1/,$ p' /nfs/pathogen003/tdo/Pfalciparum/3D7/Reference/Oct2011/Pf3D7_v3.fasta
 
 ################################################################################
 # Create data directories
@@ -282,7 +282,6 @@ do
             -knownSites ${CROSSES_DIR}/hb3_dd2.combined.final.vcf.gz \
             -knownSites ${CROSSES_DIR}/3d7_hb3.combined.final.vcf.gz \
             -o ${recal_table_fn} 2> /dev/null
-
     fi
     # if [ ! -s ${post_recal_table_fn} ]; then
     #     ${GATK_EXE} \
@@ -339,6 +338,7 @@ do
                 -o ${gvcf_fn}
 			 # 2> /dev/null
         fi
+	done
 done
 
 
