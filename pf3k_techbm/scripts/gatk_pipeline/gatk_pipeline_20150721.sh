@@ -66,7 +66,7 @@ export FIRST_LAST_100BP_EXE="python $HOME/src/github/malariagen/methods-dev/pf3k
 ################################################################################
 
 get_RG () {
-    $SAMTOOLS_EXE view -H "$1" | grep '@RG'
+    $SAMTOOLS_EXE view -H "$1" | grep '^@RG'
 }
 
 # get_RG /nfs/team112_internal/production_files/Pf/4_0/PFprog1/PG0008_CW/PG0008_CW.bam
