@@ -236,7 +236,7 @@ do
             -I ${dedup_fn} \
             -o ${targets_fn} 2> /dev/null
     fi
-    if [ ! -s ${targets_fn} ]; then
+    if [ ! -s ${realigned_fn} ]; then
         ${GATK_EXE} \
             -T IndelRealigner \
             -R ${REF_GENOME} \
@@ -520,16 +520,6 @@ do
 	        --snpEffFile ${snpeff_vcf_fn} \
 	        -o ${snpeff_annotated_vcf_fn} \
 	        2> /dev/null
-	fi
-        
-    if not os.path.isfile(annotated_vcf_fn+'.gz') or rewrite:
-        !cat {snpeff_annotated_vcf_fn} \
-        | vcf-annotate -a ${REGIONS_FN} \
-           -d key=INFO,ID=RegionType,Number=1,Type=String,Description='The type of genome region within which the variant is found. SubtelomericRepeat: repetitive regions at the ends of the chromosomes. SubtelomericHypervariable: subtelomeric region of poor conservation between the 3D7 reference genome and other samples. InternalHypervariable: chromosome-internal region of poor conservation between the 3D7 reference genome and other samples. Centromere: start and end coordinates of the centromere genome annotation. Core: everything else.' \
-           -c CHROM,FROM,TO,INFO/RegionType \
-        > ${annotated_vcf_fn}
-        bgzip -f ${annotated_vcf_fn}
-        tabix -p vcf -f ${annotated_vcf_fn}.gz
 	fi
 done
 
