@@ -22,6 +22,7 @@
 # directories
 export ORIGINAL_DIR=`pwd`
 export PROCESSED_DATA_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/assembled_samples"
+export REF_GENOME_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/Pf3D7_GeneDB"
 export OPT_DIR="$HOME/src/github/malariagen/methods-dev/pf3k_techbm/opt"
 export CROSSES_DIR="/nfs/team112_internal/oxford_mirror/data/plasmodium/pfalciparum/pf-crosses/data/public/1.0"
 
@@ -37,7 +38,15 @@ export MAX_GAUSSIANS_INDEL=4
 export SAMPLE_MANIFEST="$HOME/src/github/malariagen/methods-dev/pf3k_techbm/meta/validation_sample_bams.txt"
 export SHUFFLED_SAMPLE_MANIFEST="$HOME/src/github/malariagen/methods-dev/pf3k_techbm/meta/validation_sample_bams_shuffled.txt"
 
+# reference genome
+export REF_GENOME_DATE="2015-07"
+export REF_GENOME_FASTA_URL="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gff3/${REF_GENOME_DATE}/Pfalciparum.genome.fasta.gz"
+export REF_GENOME_GFF_URL="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gff3/${REF_GENOME_DATE}/Pfalciparum.gff3.gz"
+export ADDITIONAL_REF_GENOME_FASTA="/nfs/pathogen003/tdo/Pfalciparum/3D7/Reference/Oct2011/Pf3D7_v3.fasta"
+
 # data files
+export REF_GENOME="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa"
+export REF_GENOME_INDEX="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa.fai"
 export REF_GENOME="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa"
 export REF_GENOME_INDEX="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa.fai"
 export SNPEFF_DB="Pf3D7_GeneDB"
@@ -127,6 +136,14 @@ if [ ! -s ${OPT_DIR}/gatk/GenomeAnalysisTK.jar ]; then
 fi
 
 
+
+################################################################################
+# Download reference and create SnpEff database
+################################################################################
+
+ftp://ftp.sanger.ac.uk/pub/project/pathogens/gff3/2015-07/Pfalciparum.genome.fasta.gz
+
+sed -n '/>PF_apicoplast_genome_1/,$ p' /nfs/pathogen003/tdo/Pfalciparum/3D7/Reference/Oct2011/Pf3D7_v3.fasta
 
 ################################################################################
 # Create data directories
@@ -319,7 +336,8 @@ do
                 --max_alternate_alleles ${MAX_ALTERNATE_ALLELES} \
                 --annotation HomopolymerRun \
                 --annotation VariantType \
-                -o ${gvcf_fn} 2> /dev/null
+                -o ${gvcf_fn}
+			 # 2> /dev/null
         fi
 done
 
