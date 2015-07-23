@@ -26,7 +26,7 @@ export OPT_DIR="$HOME/src/github/malariagen/methods-dev/pf3k_techbm/opt"
 export CROSSES_DIR="/nfs/team112_internal/oxford_mirror/data/plasmodium/pfalciparum/pf-crosses/data/public/1.0"
 
 # parameters
-export MAX_ALTERNATE_ALLELES=2
+export MAX_ALTERNATE_ALLELES=6
 export GVCF_BATCH_SIZE=3
 export VQSR_ANNOTATIONS_SNP="-an QD -an MQ -an MQRankSum -an ReadPosRankSum -an FS -an SOR -an DP"
 export VQSR_ANNOTATIONS_INDEL="-an QD -an DP -an FS -an SOR -an ReadPosRankSum -an MQRankSum"
@@ -267,25 +267,25 @@ do
             -o ${recal_table_fn} 2> /dev/null
 
     fi
-    if [ ! -s ${post_recal_table_fn} ]; then
-        ${GATK_EXE} \
-            -T BaseRecalibrator \
-            -R ${REF_GENOME} \
-            -I ${realigned_fn} \
-            -knownSites ${CROSSES_DIR}/7g8_gb4.combined.final.vcf.gz \
-            -knownSites ${CROSSES_DIR}/hb3_dd2.combined.final.vcf.gz \
-            -knownSites ${CROSSES_DIR}/3d7_hb3.combined.final.vcf.gz \
-            -BQSR ${recal_table_fn} \
-            -o ${post_recal_table_fn} 2> /dev/null
-    fi
-    if [ ! -s ${recal_plots_fn} ]; then
-        ${GATK_EXE} \
-            -T AnalyzeCovariates \
-            -R ${REF_GENOME} \
-            -before ${recal_table_fn} \
-            -after ${post_recal_table_fn} \
-            -plots ${recal_plots_fn} 2> /dev/null
-    fi
+    # if [ ! -s ${post_recal_table_fn} ]; then
+    #     ${GATK_EXE} \
+    #         -T BaseRecalibrator \
+    #         -R ${REF_GENOME} \
+    #         -I ${realigned_fn} \
+    #         -knownSites ${CROSSES_DIR}/7g8_gb4.combined.final.vcf.gz \
+    #         -knownSites ${CROSSES_DIR}/hb3_dd2.combined.final.vcf.gz \
+    #         -knownSites ${CROSSES_DIR}/3d7_hb3.combined.final.vcf.gz \
+    #         -BQSR ${recal_table_fn} \
+    #         -o ${post_recal_table_fn} 2> /dev/null
+    # fi
+    # if [ ! -s ${recal_plots_fn} ]; then
+    #     ${GATK_EXE} \
+    #         -T AnalyzeCovariates \
+    #         -R ${REF_GENOME} \
+    #         -before ${recal_table_fn} \
+    #         -after ${post_recal_table_fn} \
+    #         -plots ${recal_plots_fn} 2> /dev/null
+    # fi
     if [ ! -s ${recal_bam_fn} ]; then
         ${GATK_EXE} \
             -T PrintReads \
