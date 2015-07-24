@@ -142,7 +142,7 @@ export PERL5LIB=${OPT_DIR}/vcftools/vcftools_${VCFTOOLS_VERSION}/perl/
 if [ ! -s ${VCF_ANNOTATE_EXE} ]; then
     mkdir -p ${OPT_DIR}/vcftools
     cd ${OPT_DIR}/vcftools
-	wget http://downloads.sourceforge.net/project/vcftools/vcftools_${VCFTOOLS_VERSION}.tar.gz
+    wget http://downloads.sourceforge.net/project/vcftools/vcftools_${VCFTOOLS_VERSION}.tar.gz
     tar xzf vcftools_${VCFTOOLS_VERSION}.tar.gz
     cd vcftools_${VCFTOOLS_VERSION}
     make 2> /dev/null
@@ -558,7 +558,7 @@ do
             -selectType SNP \
             -o ${unfiltered_vcf_fn} 2> /dev/null
     fi
-    if [ ! -s ${filtered_vcf_fn} ]; then
+    if [ ! -s ${filtered_vcf_fn}.gz ]; then
         ${GATK_EXE} \
             -T ApplyRecalibration \
             -R ${REF_GENOME} \
@@ -568,9 +568,9 @@ do
             --ts_filter_level 99.5 \
             -mode SNP \
             -o ${filtered_vcf_fn} 2> /dev/null
+        bgzip -f ${filtered_vcf_fn}
+        tabix -p vcf -f ${filtered_vcf_fn}.gz
     fi
-    bgzip -f ${filtered_vcf_fn}
-    tabix -p vcf -f ${filtered_vcf_fn}.gz
     unfiltered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/unfiltered.INDEL.${chromosome}.vcf"
     filtered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.INDEL.${chromosome}.vcf"
     recal_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_INDEL.recal"
@@ -593,9 +593,9 @@ do
             --ts_filter_level 99.0 \
             -mode INDEL \
             -o ${filtered_vcf_fn} 2> /dev/null
+        bgzip -f ${filtered_vcf_fn}
+        tabix -p vcf -f ${filtered_vcf_fn}.gz
     fi
-    bgzip -f ${filtered_vcf_fn}
-    tabix -p vcf -f ${filtered_vcf_fn}.gz
 done
 
 
@@ -603,7 +603,7 @@ done
 for (( chromosome_index=1; chromosome_index<=${number_of_chromosomes}; chromosome_index++ ));
 do
     chromosome=`awk "NR==$chromosome_index" ${REF_GENOME_INDEX} | cut -f1`
-    filtered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.SNP.${chromosome}.vcf"
+    filtered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.SNP.${chromosome}.vcf.gz"
     snpeff_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.snpeff.SNP.${chromosome}.vcf"
     snpeff_annotated_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.snpeff_annotated.SNP.${chromosome}.vcf"
     annotated_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.annotated.SNP.${chromosome}.vcf"
