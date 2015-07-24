@@ -14,7 +14,6 @@
 # Set up envirnoment variables
 ################################################################################
 
-
 # # catch errors
 # set -e
 # set -o pipefail
@@ -381,6 +380,7 @@ do
             -knownSites ${CROSSES_DIR}/3d7_hb3.combined.final.vcf.gz \
             -o ${recal_table_fn} 2> /dev/null
     fi
+	# Note the following is in recommended best practices, but makes no difference to 
     # if [ ! -s ${post_recal_table_fn} ]; then
     #     ${GATK_EXE} \
     #         -T BaseRecalibrator \
@@ -431,8 +431,7 @@ do
                 --variant_index_type LINEAR \
                 --variant_index_parameter 128000 \
                 --max_alternate_alleles ${MAX_ALTERNATE_ALLELES} \
-                -o ${gvcf_fn}
-             # 2> /dev/null
+                -o ${gvcf_fn} 2> /dev/null
              # --annotation HomopolymerRun \
              # --annotation VariantType \
         fi
@@ -523,8 +522,7 @@ if [ ! -s ${recal_fn} ]; then
         --maxGaussians ${MAX_GAUSSIANS_SNP} \
         -mode SNP \
         -recalFile ${recal_fn} \
-        -tranchesFile ${tranches_fn}
-# 2> /dev/null
+        -tranchesFile ${tranches_fn} 2> /dev/null
 fi
 
 recal_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_INDEL.recal"
@@ -541,8 +539,7 @@ if [ ! -s ${recal_fn} ]; then
         --maxGaussians ${MAX_GAUSSIANS_INDEL} \
         -mode INDEL \
         -recalFile ${recal_fn} \
-        -tranchesFile ${tranches_fn}
- # 2> /dev/null
+        -tranchesFile ${tranches_fn} 2> /dev/null
 fi
 
 
@@ -572,8 +569,7 @@ do
             -recalFile ${recal_fn} \
             --ts_filter_level 99.5 \
             -mode SNP \
-            -o ${filtered_vcf_fn}
-        # 2> /dev/null
+            -o ${filtered_vcf_fn} 2> /dev/null
         bgzip -f ${filtered_vcf_fn}
         tabix -p vcf -f ${filtered_vcf_fn}.gz
     fi
@@ -598,8 +594,7 @@ do
             -recalFile ${recal_fn} \
             --ts_filter_level 99.0 \
             -mode INDEL \
-            -o ${filtered_vcf_fn}
-         2> /dev/null
+            -o ${filtered_vcf_fn} 2> /dev/null
         bgzip -f ${filtered_vcf_fn}
         tabix -p vcf -f ${filtered_vcf_fn}.gz
     fi
@@ -704,8 +699,8 @@ do
             --variant:indel ${annotated_indel_vcf_fn} \
             -o ${annotated_combined_vcf_fn} \
             -genotypeMergeOptions PRIORITIZE \
-            -priority snp,indel \
-            2> /dev/null
+            -priority snp,indel
+            # 2> /dev/null
         bgzip -f ${annotated_combined_vcf_fn}
         tabix -p vcf -f ${annotated_combined_vcf_fn}.gz
     fi
