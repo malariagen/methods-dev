@@ -374,7 +374,7 @@ do
         touch ${gvcf_list_filename}
         echo ${gvcf_fn} >> ${gvcf_list_filename}
         if [ ${position_in_batch} == ${GVCF_BATCH_SIZE} ] || [ ${sample_index} == ${number_of_samples} ]; then
-            if [ ! -s ${combined_gvcf_fn}]; then
+            if [ ! -s ${combined_gvcf_fn} ]; then
                 ${GATK_EXE} \
                     -T CombineGVCFs \
                     -R ${REF_GENOME} \
