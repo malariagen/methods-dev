@@ -356,7 +356,7 @@ do
     for (( sample_index=1; sample_index<=${number_of_samples}; sample_index++ ));
     do
         position_in_batch=position_in_batch+1
-        if [ ${position_in_batch} -gt ${GVCF_BATCH_SIZE}]; then
+        if [ ${position_in_batch} -gt ${GVCF_BATCH_SIZE} ]; then
             position_in_batch=1
             batch_index=batch_index+1
         fi
