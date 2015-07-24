@@ -61,6 +61,7 @@ export PICARD_VERSION="1.136"
 export BWA_VERSION="0.7.12"
 export SAMTOOLS_VERSION="1.2"
 export GATK_VERSION="3.4-46"
+export VCFTOOLS_VERSION="0.1.12b"
 
 # executables
 export JAVA7_EXE="/software/jre1.7.0_25/bin/java"
@@ -70,7 +71,7 @@ export SNPEFF_EXE="${JAVA7_EXE} -jar ${SNPEFF_DIR}/snpEff.jar"
 export BWA_EXE="${OPT_DIR}/bwa/bwa-${BWA_VERSION}/bwa"
 export GATK_EXE="${JAVA7_EXE} -jar ${OPT_DIR}/gatk/GenomeAnalysisTK.jar"
 export FIRST_LAST_100BP_EXE="python $HOME/src/github/malariagen/methods-dev/pf3k_techbm/scripts/gatk_pipeline/first_last_100bp.py"
-
+export VCF_ANNOTATE_EXE="${OPT_DIR}/vcftools/vcftools_${VCFTOOLS_VERSION}/perl/vcf-annotate"
 
 
 ################################################################################
@@ -135,6 +136,19 @@ if [ ! -s ${OPT_DIR}/gatk/GenomeAnalysisTK.jar ]; then
     tar xjf GenomeAnalysisTK-${GATK_VERSION}.tar.bz2
     cd ${ORIGINAL_DIR}
 fi
+
+# Install VCFtools
+export PERL5LIB=${OPT_DIR}/vcftools/vcftools_${VCFTOOLS_VERSION}/perl/
+if [ ! -s ${OPT_DIR}/vcftools/vcftools ]; then
+    mkdir -p ${OPT_DIR}/vcftools
+    cd ${OPT_DIR}/vcftools
+	wget http://downloads.sourceforge.net/project/vcftools/vcftools_${VCFTOOLS_VERSION}.tar.gz
+    tar xzf vcftools_${VCFTOOLS_VERSION}.tar.gz
+    cd vcftools_${VCFTOOLS_VERSION}
+    make 2> /dev/null
+    cd ${ORIGINAL_DIR}
+fi
+
 
 
 
@@ -615,10 +629,10 @@ do
     fi
     if [ ! -s ${annotated_vcf_fn} ]; then
         cat ${snpeff_annotated_vcf_fn} \
-        | vcf-annotate -a {regions_fn} \
+        | ${VCF_ANNOTATE_EXE} -a {regions_fn} \
            -d key=INFO,ID=RegionType,Number=1,Type=String,Description='The type of genome region within which the variant is found. SubtelomericRepeat: repetitive regions at the ends of the chromosomes. SubtelomericHypervariable: subtelomeric region of poor conservation between the 3D7 reference genome and other samples. InternalHypervariable: chromosome-internal region of poor conservation between the 3D7 reference genome and other samples. Centromere: start and end coordinates of the centromere genome annotation. Core: everything else.' \
            -c CHROM,FROM,TO,INFO/RegionType \
-        > {annotated_vcf_fn}
+        > ${annotated_vcf_fn}
         ${GATK_EXE} \
             -T VariantAnnotator \
             -R ${REF_GENOME} \
