@@ -355,10 +355,10 @@ do
     position_in_batch=0
     for (( sample_index=1; sample_index<=${number_of_samples}; sample_index++ ));
     do
-        position_in_batch=position_in_batch+1
+        position_in_batch=${position_in_batch}+1
         if [ ${position_in_batch} -gt ${GVCF_BATCH_SIZE} ]; then
             position_in_batch=1
-            batch_index=batch_index+1
+            batch_index=${batch_index}+1
         fi
         if [ ${position_in_batch} == 1 ]; then
             gvcf_list_filename="${PROCESSED_DATA_DIR}/vcfs/gvcf/lists/gvcfs/${chromosome}.${batch_index}.list"
