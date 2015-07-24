@@ -613,8 +613,45 @@ do
     filtered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.SNP.${chromosome}.vcf.gz"
     snpeff_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.snpeff.SNP.${chromosome}.vcf"
     snpeff_annotated_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.snpeff_annotated.SNP.${chromosome}.vcf"
-    annotated_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.annotated.SNP.${chromosome}.vcf"
-    
+    annotated_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.annotated.SNP.${chromosome}.vcf"    
+    if [ ! -s ${snpeff_vcf_fn} ]; then
+        ${SNPEFF_EXE} \
+            -v -o gatk ${SNPEFF_DB} \
+            ${filtered_vcf_fn} \
+            -no-downstream \
+            -no-upstream \
+            > ${snpeff_vcf_fn} \
+            2> /dev/null
+    fi
+    if [ ! -s ${snpeff_annotated_vcf_fn} ]; then
+        ${GATK_EXE} \
+            -T VariantAnnotator \
+            -R ${REF_GENOME} \
+            -A SnpEff \
+            --variant ${filtered_vcf_fn} \
+            --snpEffFile ${snpeff_vcf_fn} \
+            -o ${snpeff_annotated_vcf_fn} \
+            2> /dev/null
+    fi
+    if [ ! -s ${annotated_vcf_fn} ]; then
+        cat ${snpeff_annotated_vcf_fn} \
+        | ${VCF_ANNOTATE_EXE} -a {regions_fn} \
+           -d key=INFO,ID=RegionType,Number=1,Type=String,Description='The type of genome region within which the variant is found. SubtelomericRepeat: repetitive regions at the ends of the chromosomes. SubtelomericHypervariable: subtelomeric region of poor conservation between the 3D7 reference genome and other samples. InternalHypervariable: chromosome-internal region of poor conservation between the 3D7 reference genome and other samples. Centromere: start and end coordinates of the centromere genome annotation. Core: everything else.' \
+           -c CHROM,FROM,TO,INFO/RegionType \
+        > ${annotated_vcf_fn}
+        ${GATK_EXE} \
+            -T VariantAnnotator \
+            -R ${REF_GENOME} \
+            -A SnpEff \
+            --variant ${filtered_vcf_fn} \
+            --snpEffFile ${snpeff_vcf_fn} \
+            -o ${snpeff_annotated_vcf_fn} \
+            2> /dev/null
+    fi
+    filtered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.INDEL.${chromosome}.vcf.gz"
+    snpeff_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.snpeff.INDEL.${chromosome}.vcf"
+    snpeff_annotated_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.snpeff_annotated.INDEL.${chromosome}.vcf"
+    annotated_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.annotated.INDEL.${chromosome}.vcf"
     if [ ! -s ${snpeff_vcf_fn} ]; then
         ${SNPEFF_EXE} \
             -v -o gatk ${SNPEFF_DB} \
@@ -651,4 +688,24 @@ do
     fi
 done
 
+
+# Combine SNP and INDEL
+for (( chromosome_index=1; chromosome_index<=${number_of_chromosomes}; chromosome_index++ ));
+do
+    chromosome=`awk "NR==$chromosome_index" ${REF_GENOME_INDEX} | cut -f1`
+    annotated_snp_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.annotated.SNP.${chromosome}.vcf"
+    annotated_indel_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.annotated.INDEL.${chromosome}.vcf"
+    annotated_combined_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.annotated.SNP_INDEL.${chromosome}.vcf"
+    if [ ! -s ${annotated_combined_vcf_fn}.gz ]; then
+        ${GATK_EXE} \
+            -T VariantAnnotator \
+            -R ${REF_GENOME} \
+            --variant:snp ${annotated_snp_vcf_fn} \
+            --variant:indel ${annotated_indel_vcf_fn} \
+            -o ${annotated_combined_vcf_fn} \
+            -genotypeMergeOptions PRIORITIZE \
+            -priority snp,indel \
+            2> /dev/null
+    fi
+done
 
