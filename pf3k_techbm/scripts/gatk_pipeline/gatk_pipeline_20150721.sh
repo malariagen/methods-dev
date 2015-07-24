@@ -54,8 +54,8 @@ export SNPEFF_CONFIG_FN="${SNPEFF_DIR}/snpEff.config"
 export REF_GENOME="${REF_GENOME_DIR}/Pfalciparum.genome.fasta"
 export REF_GENOME_INDEX="${REF_GENOME_DIR}/Pfalciparum.genome.fasta.fai"
 export REF_GENOME_DICTIONARY="${REF_GENOME_DIR}/Pfalciparum.genome.dict"
-export REF_GENOME="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa"
-export REF_GENOME_INDEX="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa.fai"
+# export REF_GENOME="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa"
+# export REF_GENOME_INDEX="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa.fai"
 export REGIONS_FN="../../../pf-crosses/meta/regions-20130225.bed.gz"
 
 # software versions
