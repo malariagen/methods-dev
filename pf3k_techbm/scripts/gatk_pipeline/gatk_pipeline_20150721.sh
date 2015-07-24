@@ -431,8 +431,8 @@ do
                 --variant_index_type LINEAR \
                 --variant_index_parameter 128000 \
                 --max_alternate_alleles ${MAX_ALTERNATE_ALLELES} \
-                --annotation HomopolymerRun \
-                --annotation VariantType \
+                # --annotation HomopolymerRun \
+                # --annotation VariantType \
                 -o ${gvcf_fn}
              # 2> /dev/null
         fi
@@ -488,7 +488,7 @@ do
             -R ${REF_GENOME} \
             --variant ${combined_gvcf_list_filename} \
             --max_alternate_alleles ${MAX_ALTERNATE_ALLELES} \
-            --annotation HomopolymerRun \
+            # --annotation HomopolymerRun \
             --annotation VariantType \
             -o ${genotyped_vcf_fn}
 		 # 2> /dev/null
