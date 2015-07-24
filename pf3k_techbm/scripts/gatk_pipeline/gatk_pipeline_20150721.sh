@@ -520,7 +520,8 @@ if [ ! -s ${recal_fn} ]; then
         --maxGaussians ${MAX_GAUSSIANS_SNP} \
         -mode SNP \
         -recalFile ${recal_fn} \
-        -tranchesFile ${tranches_fn} 2> /dev/null
+        -tranchesFile ${tranches_fn}
+# 2> /dev/null
 fi
 
 recal_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_INDEL.recal"
@@ -537,7 +538,8 @@ if [ ! -s ${recal_fn} ]; then
         --maxGaussians ${MAX_GAUSSIANS_INDEL} \
         -mode INDEL \
         -recalFile ${recal_fn} \
-        -tranchesFile ${tranches_fn} 2> /dev/null
+        -tranchesFile ${tranches_fn}
+ # 2> /dev/null
 fi
 
 
