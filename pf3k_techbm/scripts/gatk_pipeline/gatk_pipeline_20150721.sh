@@ -24,6 +24,7 @@ export ORIGINAL_DIR=`pwd`
 export PROCESSED_DATA_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/assembled_samples"
 export REF_GENOME_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/Pf3D7_GeneDB"
 export OPT_DIR="$HOME/src/github/malariagen/methods-dev/pf3k_techbm/opt"
+export SNPEFF_DIR="${OPT_DIR}/snpeff/snpEff"
 export CROSSES_DIR="/nfs/team112_internal/oxford_mirror/data/plasmodium/pfalciparum/pf-crosses/data/public/1.0"
 
 # parameters
@@ -42,14 +43,17 @@ export SHUFFLED_SAMPLE_MANIFEST="$HOME/src/github/malariagen/methods-dev/pf3k_te
 export REF_GENOME_DATE="2015-07"
 export REF_GENOME_FASTA_URL="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gff3/${REF_GENOME_DATE}/Pfalciparum.genome.fasta.gz"
 export REF_GENOME_GFF_URL="ftp://ftp.sanger.ac.uk/pub/project/pathogens/gff3/${REF_GENOME_DATE}/Pfalciparum.gff3.gz"
-export ADDITIONAL_REF_GENOME_FASTA="/nfs/pathogen003/tdo/Pfalciparum/3D7/Reference/Oct2011/Pf3D7_v3.fasta"
+export APICOPLAST_REF_GENOME_FASTA="/nfs/pathogen003/tdo/Pfalciparum/3D7/Reference/Oct2011/Pf3D7_v3.fasta"
+export APICOPLAST_SEQUENCE_NAME="PF_apicoplast_genome_1"
+export SNPEFF_DB="Pf3D7_GeneDB"
+export SNPEFF_CONFIG_FN="${SNPEFF_DIR}/snpEff.config"
 
 # data files
+export REF_GENOME="${REF_GENOME_DIR}/Pfalciparum.genome.fasta"
+export REF_GENOME_INDEX="${REF_GENOME_DIR}/Pfalciparum.genome.fasta.fai"
+export REF_GENOME_DICTIONARY="${REF_GENOME_DIR}/Pfalciparum.genome.dict"
 export REF_GENOME="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa"
 export REF_GENOME_INDEX="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa.fai"
-export REF_GENOME="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa"
-export REF_GENOME_INDEX="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa.fai"
-export SNPEFF_DB="Pf3D7_GeneDB"
 export REGIONS_FN="../../../pf-crosses/meta/regions-20130225.bed.gz"
 
 # software versions
@@ -62,7 +66,6 @@ export GATK_VERSION="3.4-46"
 export JAVA7_EXE="/software/jre1.7.0_25/bin/java"
 export SAMTOOLS_EXE="${OPT_DIR}/samtools/samtools-${SAMTOOLS_VERSION}/samtools"
 export PICARD_EXE="${JAVA7_EXE} -jar ${OPT_DIR}/picard/picard-tools-${PICARD_VERSION}/picard.jar"
-export SNPEFF_DIR="${OPT_DIR}/snpeff/snpEff"
 export SNPEFF_EXE="${JAVA7_EXE} -jar ${SNPEFF_DIR}/snpEff.jar"
 export BWA_EXE="${OPT_DIR}/bwa/bwa-${BWA_VERSION}/bwa"
 export GATK_EXE="${JAVA7_EXE} -jar ${OPT_DIR}/gatk/GenomeAnalysisTK.jar"
@@ -77,8 +80,6 @@ export FIRST_LAST_100BP_EXE="python $HOME/src/github/malariagen/methods-dev/pf3k
 get_RG () {
     $SAMTOOLS_EXE view -H "$1" | grep '^@RG'
 }
-
-# get_RG /nfs/team112_internal/production_files/Pf/4_0/PFprog1/PG0008_CW/PG0008_CW.bam
 
 
 
@@ -141,9 +142,92 @@ fi
 # Download reference and create SnpEff database
 ################################################################################
 
-# ftp://ftp.sanger.ac.uk/pub/project/pathogens/gff3/2015-07/Pfalciparum.genome.fasta.gz
-#
+if [ ! -d "${REF_GENOME_DIR}" ]; then
+    mkdir -p "${REF_GENOME_DIR}"
+fi
+
 # sed -n '/>PF_apicoplast_genome_1/,$ p' /nfs/pathogen003/tdo/Pfalciparum/3D7/Reference/Oct2011/Pf3D7_v3.fasta
+
+if [ ! -s ${REF_GENOME} ]; then
+    wget ${REF_GENOME_FASTA_URL} -O ${REF_GENOME}.gz
+    gunzip ${REF_GENOME}.gz
+    sed -n '/>PF_apicoplast_genome_1/,$ p' ${APICOPLAST_REF_GENOME_FASTA} >> ${REF_GENOME}
+fi
+
+# Generate BWA index
+if [ ! -s ${REF_GENOME}.bwt ] || [ ! -s ${REF_GENOME}.pac ] || [ ! -s ${REF_GENOME}.ann ] || [ ! -s ${REF_GENOME}.amb ] || [ ! -s ${REF_GENOME}.sa ]; then
+    $BWA_EXE index ${REF_GENOME}
+fi
+
+# Generate samtools index
+if [ ! -s ${REF_GENOME}.fai ]; then
+    $SAMTOOLS_EXE faidx ${REF_GENOME}
+fi
+
+# Generate sequence dictionary
+if [ ! -s ${REF_GENOME_DICTIONARY} ]; then
+    $PICARD_EXE CreateSequenceDictionary \
+    REFERENCE=${REF_GENOME} \
+    OUTPUT=${REF_GENOME_DICTIONARY}
+fi
+
+# Make directory for SnpEff database
+if [ ! -d "${SNPEFF_DIR}/data/${SNPEFF_DB}" ]; then
+    mkdir -p ${SNPEFF_DIR}/data/${SNPEFF_DB}
+fi
+
+# Put appropriate gff in SnpEff database directory
+if [ ! -s "${SNPEFF_DIR}/data/${SNPEFF_DB}/genes.gff" ]; then
+    gff_download_date=`date`
+    wget ${REF_GENOME_GFF_URL} -O "${SNPEFF_DIR}/data/${SNPEFF_DB}/genes.gff.gz"
+    gunzip "${SNPEFF_DIR}/data/${SNPEFF_DB}/genes.gff.gz"
+fi
+
+# Put appropriate fasta in SnpEff database directory
+if [ ! -s "${SNPEFF_DIR}/data/${SNPEFF_DB}/sequences.fa" ]; then
+    cp ${REF_GENOME} "${SNPEFF_DIR}/data/${SNPEFF_DB}/sequences.fa"
+fi
+
+# Update SnpEff config file with appropriate lines
+if [ `grep ${SNPEFF_DB} ${SNPEFF_CONFIG_FN} | wc -l` == 0 ]; then
+    echo "" >> ${SNPEFF_CONFIG_FN}
+    echo "#" ${SNPEFF_DB} "downloaded from" ${REF_GENOME_GFF_URL} ${gff_download_date} >> ${SNPEFF_CONFIG_FN}
+    echo ${SNPEFF_DB}".genome: Plasmodium_falciparum" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".Pf_M76611.codonTable: Protozoan_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".reference: "${REF_GENOME_GFF_URL} >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".mal_mito_1.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".mal_mito_2.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".mal_mito_3.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_10\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_15\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_16\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_17\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".mal_mito_RNA19\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_1\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_20\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_21\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_9\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_LSUC\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_LSUF\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_LSUG\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_RNA11\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_RNA12\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_RNA14\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_RNA18\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_RNA22\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_RNA4\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_RNA5\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_RNA6\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_RNA7\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_rna_SSUF\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+    echo "        "${SNPEFF_DB}".malmito_SSUB\:rRNA.codonTable : Vertebrate_Mitochondrial" >> ${SNPEFF_CONFIG_FN}
+fi
+
+if [ ! -s "${SNPEFF_DIR}/data/${SNPEFF_DB}/snpEffectPredictor.bin" ]; then
+    $SNPEFF_EXE build -gff3 -v ${SNPEFF_DB}
+fi
+
+
 
 ################################################################################
 # Create data directories
@@ -373,7 +457,7 @@ do
         gvcf_fn="${PROCESSED_DATA_DIR}/vcfs/gvcf/samples/${sample_name}.raw.snps.indels.${chromosome}.g.vcf"
         touch ${gvcf_list_filename}
         echo ${gvcf_fn} >> ${gvcf_list_filename}
-        echo ${position_in_batch} ${GVCF_BATCH_SIZE} ${sample_index} ${number_of_samples}
+        # echo ${position_in_batch} ${GVCF_BATCH_SIZE} ${sample_index} ${number_of_samples}
         if [ ${position_in_batch} == ${GVCF_BATCH_SIZE} ] || [ ${sample_index} == ${number_of_samples} ]; then
             if [ ! -s ${combined_gvcf_fn} ]; then
                 ${GATK_EXE} \
@@ -390,6 +474,8 @@ do
             -R ${REF_GENOME} \
             --variant ${combined_gvcf_list_filename} \
             --max_alternate_alleles ${MAX_ALTERNATE_ALLELES} \
+            --annotation HomopolymerRun \
+            --annotation VariantType \
             -o ${genotyped_vcf_fn} 2> /dev/null
     fi
 done
