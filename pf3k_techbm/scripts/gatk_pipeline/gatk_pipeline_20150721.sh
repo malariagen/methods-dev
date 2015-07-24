@@ -223,7 +223,7 @@ do
             INPUT=${bwa_mem_fn} \
             OUTPUT=${sorted_fn} \
             SORT_ORDER=coordinate
-		# 2> /dev/null
+        # 2> /dev/null
     fi
     if [ ! -s ${dedup_fn} ]; then
         ${PICARD_EXE} MarkDuplicates \
@@ -234,7 +234,7 @@ do
     if [ ! -s ${dedup_index_fn} ]; then
         ${PICARD_EXE} BuildBamIndex \
             INPUT=${dedup_fn}
-		 # 2> /dev/null
+         # 2> /dev/null
     fi
 done
 
@@ -336,9 +336,9 @@ do
                 --annotation HomopolymerRun \
                 --annotation VariantType \
                 -o ${gvcf_fn}
-			 # 2> /dev/null
+             # 2> /dev/null
         fi
-	done
+    done
 done
 
 
@@ -366,11 +366,13 @@ do
                 rm ${gvcf_list_filename}
             fi
             combined_gvcf_fn="${PROCESSED_DATA_DIR}/gvcf/combined_gvcf/combined.${chromosome}.${batch_index}.g.vcf"
+            touch ${combined_gvcf_list_filename}
             echo ${combined_gvcf_fn} >> ${combined_gvcf_list_filename}
         fi
         sample_name=`awk "NR==$sample_index" ${SHUFFLED_SAMPLE_MANIFEST} | cut -f1`
         gvcf_fn="${PROCESSED_DATA_DIR}/vcfs/gvcf/samples/${sample_name}.raw.snps.indels.${chromosome}.g.vcf"
-        echo ${gvcf_fn} >> gvcf_list_filename
+        touch ${gvcf_list_filename}
+        echo ${gvcf_fn} >> ${gvcf_list_filename}
         if [ ${position_in_batch} == ${GVCF_BATCH_SIZE} ] || [ ${sample_index} == ${number_of_samples} ]; then
             if [ ! -s ${combined_gvcf_fn}]; then
                 ${GATK_EXE} \
@@ -445,54 +447,54 @@ do
     genotyped_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/raw.snps.indels.${chromosome}.vcf"
     unfiltered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/unfiltered.SNP.${chromosome}.vcf"
     filtered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.SNP.${chromosome}.vcf"
-	recal_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_SNP.recal"
-	tranches_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_SNP.tranches"
-	if [ ! -s ${unfiltered_vcf_fn} ]; then
-	    ${GATK_EXE} \
-	        -T SelectVariants \
-	        -R ${REF_GENOME} \
-	        -V ${genotyped_vcf_fn} \
-	        -selectType SNP \
-	        -o ${unfiltered_vcf_fn} 2> /dev/null
-	fi
-	if [ ! -s ${filtered_vcf_fn} ]; then
-	    ${GATK_EXE} \
-	        -T ApplyRecalibration \
-	        -R ${REF_GENOME} \
-	        -input ${unfiltered_vcf_fn} \
-	        -tranchesFile ${tranches_fn} \
-	        -recalFile ${recal_fn} \
-	        --ts_filter_level 99.5 \
-	        -mode SNP \
-	        -o ${filtered_vcf_fn} 2> /dev/null
-	fi
-	bgzip -f ${filtered_vcf_fn}
-	tabix -p vcf -f ${filtered_vcf_fn}.gz
+    recal_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_SNP.recal"
+    tranches_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_SNP.tranches"
+    if [ ! -s ${unfiltered_vcf_fn} ]; then
+        ${GATK_EXE} \
+            -T SelectVariants \
+            -R ${REF_GENOME} \
+            -V ${genotyped_vcf_fn} \
+            -selectType SNP \
+            -o ${unfiltered_vcf_fn} 2> /dev/null
+    fi
+    if [ ! -s ${filtered_vcf_fn} ]; then
+        ${GATK_EXE} \
+            -T ApplyRecalibration \
+            -R ${REF_GENOME} \
+            -input ${unfiltered_vcf_fn} \
+            -tranchesFile ${tranches_fn} \
+            -recalFile ${recal_fn} \
+            --ts_filter_level 99.5 \
+            -mode SNP \
+            -o ${filtered_vcf_fn} 2> /dev/null
+    fi
+    bgzip -f ${filtered_vcf_fn}
+    tabix -p vcf -f ${filtered_vcf_fn}.gz
     unfiltered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/unfiltered.INDEL.${chromosome}.vcf"
     filtered_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.INDEL.${chromosome}.vcf"
-	recal_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_INDEL.recal"
-	tranches_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_INDEL.tranches"
-	if [ ! -s ${unfiltered_vcf_fn} ]; then
-	    ${GATK_EXE} \
-	        -T SelectVariants \
-	        -R ${REF_GENOME} \
-	        -V ${genotyped_vcf_fn} \
-	        -selectType INDEL \
-	        -o ${unfiltered_vcf_fn} 2> /dev/null
-	fi
-	if [ ! -s ${filtered_vcf_fn} ]; then
-	    ${GATK_EXE} \
-	        -T ApplyRecalibration \
-	        -R ${REF_GENOME} \
-	        -input ${unfiltered_vcf_fn} \
-	        -tranchesFile ${tranches_fn} \
-	        -recalFile ${recal_fn} \
-	        --ts_filter_level 99.0 \
-	        -mode INDEL \
-	        -o ${filtered_vcf_fn} 2> /dev/null
-	fi
-	bgzip -f ${filtered_vcf_fn}
-	tabix -p vcf -f ${filtered_vcf_fn}.gz
+    recal_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_INDEL.recal"
+    tranches_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/recal/recalibrate_INDEL.tranches"
+    if [ ! -s ${unfiltered_vcf_fn} ]; then
+        ${GATK_EXE} \
+            -T SelectVariants \
+            -R ${REF_GENOME} \
+            -V ${genotyped_vcf_fn} \
+            -selectType INDEL \
+            -o ${unfiltered_vcf_fn} 2> /dev/null
+    fi
+    if [ ! -s ${filtered_vcf_fn} ]; then
+        ${GATK_EXE} \
+            -T ApplyRecalibration \
+            -R ${REF_GENOME} \
+            -input ${unfiltered_vcf_fn} \
+            -tranchesFile ${tranches_fn} \
+            -recalFile ${recal_fn} \
+            --ts_filter_level 99.0 \
+            -mode INDEL \
+            -o ${filtered_vcf_fn} 2> /dev/null
+    fi
+    bgzip -f ${filtered_vcf_fn}
+    tabix -p vcf -f ${filtered_vcf_fn}.gz
 done
 
 
@@ -504,41 +506,41 @@ do
     snpeff_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.snpeff.SNP.${chromosome}.vcf"
     snpeff_annotated_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.snpeff_annotated.SNP.${chromosome}.vcf"
     annotated_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.annotated.SNP.${chromosome}.vcf"
-	
-	if [ ! -s ${snpeff_vcf_fn} ]; then
-	    ${SNPEFF_EXE} \
-	        -v -o gatk ${SNPEFF_DB} \
-	        ${filtered_vcf_fn} \
-	        -no-downstream \
-	        -no-upstream \
-	        > ${snpeff_vcf_fn} \
-	        2> /dev/null
-	fi
-	if [ ! -s ${snpeff_annotated_vcf_fn} ]; then
-	    ${GATK_EXE} \
-	        -T VariantAnnotator \
-	        -R ${REF_GENOME} \
-	        -A SnpEff \
-	        --variant ${filtered_vcf_fn} \
-	        --snpEffFile ${snpeff_vcf_fn} \
-	        -o ${snpeff_annotated_vcf_fn} \
-	        2> /dev/null
-	fi
-	if [ ! -s ${annotated_vcf_fn} ]; then
+    
+    if [ ! -s ${snpeff_vcf_fn} ]; then
+        ${SNPEFF_EXE} \
+            -v -o gatk ${SNPEFF_DB} \
+            ${filtered_vcf_fn} \
+            -no-downstream \
+            -no-upstream \
+            > ${snpeff_vcf_fn} \
+            2> /dev/null
+    fi
+    if [ ! -s ${snpeff_annotated_vcf_fn} ]; then
+        ${GATK_EXE} \
+            -T VariantAnnotator \
+            -R ${REF_GENOME} \
+            -A SnpEff \
+            --variant ${filtered_vcf_fn} \
+            --snpEffFile ${snpeff_vcf_fn} \
+            -o ${snpeff_annotated_vcf_fn} \
+            2> /dev/null
+    fi
+    if [ ! -s ${annotated_vcf_fn} ]; then
         cat ${snpeff_annotated_vcf_fn} \
         | vcf-annotate -a {regions_fn} \
            -d key=INFO,ID=RegionType,Number=1,Type=String,Description='The type of genome region within which the variant is found. SubtelomericRepeat: repetitive regions at the ends of the chromosomes. SubtelomericHypervariable: subtelomeric region of poor conservation between the 3D7 reference genome and other samples. InternalHypervariable: chromosome-internal region of poor conservation between the 3D7 reference genome and other samples. Centromere: start and end coordinates of the centromere genome annotation. Core: everything else.' \
            -c CHROM,FROM,TO,INFO/RegionType \
         > {annotated_vcf_fn}
-	    ${GATK_EXE} \
-	        -T VariantAnnotator \
-	        -R ${REF_GENOME} \
-	        -A SnpEff \
-	        --variant ${filtered_vcf_fn} \
-	        --snpEffFile ${snpeff_vcf_fn} \
-	        -o ${snpeff_annotated_vcf_fn} \
-	        2> /dev/null
-	fi
+        ${GATK_EXE} \
+            -T VariantAnnotator \
+            -R ${REF_GENOME} \
+            -A SnpEff \
+            --variant ${filtered_vcf_fn} \
+            --snpEffFile ${snpeff_vcf_fn} \
+            -o ${snpeff_annotated_vcf_fn} \
+            2> /dev/null
+    fi
 done
 
 
