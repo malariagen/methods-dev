@@ -567,7 +567,8 @@ do
             -recalFile ${recal_fn} \
             --ts_filter_level 99.5 \
             -mode SNP \
-            -o ${filtered_vcf_fn} 2> /dev/null
+            -o ${filtered_vcf_fn}
+		# 2> /dev/null
         bgzip -f ${filtered_vcf_fn}
         tabix -p vcf -f ${filtered_vcf_fn}.gz
     fi
@@ -592,7 +593,8 @@ do
             -recalFile ${recal_fn} \
             --ts_filter_level 99.0 \
             -mode INDEL \
-            -o ${filtered_vcf_fn} 2> /dev/null
+            -o ${filtered_vcf_fn}
+		 2> /dev/null
         bgzip -f ${filtered_vcf_fn}
         tabix -p vcf -f ${filtered_vcf_fn}.gz
     fi
