@@ -625,7 +625,7 @@ do
             --variant ${filtered_vcf_fn} \
             --snpEffFile ${snpeff_vcf_fn} \
             -o ${snpeff_annotated_vcf_fn} \
-            # 2> /dev/null
+            2> /dev/null
     fi
     if [ ! -s ${annotated_vcf_fn} ]; then
         cat ${snpeff_annotated_vcf_fn} \
