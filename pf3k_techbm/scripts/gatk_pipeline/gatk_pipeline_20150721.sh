@@ -693,14 +693,14 @@ do
     annotated_combined_vcf_fn="${PROCESSED_DATA_DIR}/vcfs/vcf/filtered.annotated.SNP_INDEL.${chromosome}.vcf"
     if [ ! -s ${annotated_combined_vcf_fn}.gz ]; then
         ${GATK_EXE} \
-            -T VariantAnnotator \
+            -T CombineVariants \
             -R ${REF_GENOME} \
             --variant:snp ${annotated_snp_vcf_fn} \
             --variant:indel ${annotated_indel_vcf_fn} \
             -o ${annotated_combined_vcf_fn} \
             -genotypeMergeOptions PRIORITIZE \
-            -priority snp,indel
-            # 2> /dev/null
+            -priority snp,indel \
+            2> /dev/null
         bgzip -f ${annotated_combined_vcf_fn}
         tabix -p vcf -f ${annotated_combined_vcf_fn}.gz
     fi
