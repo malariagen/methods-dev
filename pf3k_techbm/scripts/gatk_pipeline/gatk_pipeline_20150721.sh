@@ -706,6 +706,8 @@ do
             -genotypeMergeOptions PRIORITIZE \
             -priority snp,indel \
             2> /dev/null
+        bgzip -f ${annotated_combined_vcf_fn}
+        tabix -p vcf -f ${annotated_combined_vcf_fn}.gz
     fi
 done
 
