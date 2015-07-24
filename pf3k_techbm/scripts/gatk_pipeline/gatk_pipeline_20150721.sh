@@ -346,7 +346,7 @@ done
 for (( chromosome_index=1; chromosome_index<=${number_of_chromosomes}; chromosome_index++ ));
 do
     chromosome=`awk "NR==$chromosome_index" ${REF_GENOME_INDEX} | cut -f1`
-    combined_gvcf_list_filename="${PROCESSED_DATA_DIR}/vcfs/gvcf/lists/gvcfs/${chromosome}.all.list"
+    combined_gvcf_list_filename="${PROCESSED_DATA_DIR}/vcfs/gvcf/lists/gvcfs.${chromosome}.all.list"
     if [ -f ${combined_gvcf_list_filename} ]; then
         rm ${combined_gvcf_list_filename}
     fi
