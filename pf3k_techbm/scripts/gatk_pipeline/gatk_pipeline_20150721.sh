@@ -361,7 +361,7 @@ do
             batch_index=$((${batch_index}+1))
         fi
         if [ ${position_in_batch} == 1 ]; then
-            gvcf_list_filename="${PROCESSED_DATA_DIR}/vcfs/gvcf/lists/gvcfs/${chromosome}.${batch_index}.list"
+            gvcf_list_filename="${PROCESSED_DATA_DIR}/vcfs/gvcf/lists/gvcfs.${chromosome}.${batch_index}.list"
             if [ -f ${gvcf_list_filename} ]; then
                 rm ${gvcf_list_filename}
             fi
