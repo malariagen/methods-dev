@@ -139,7 +139,7 @@ fi
 
 # Install VCFtools
 export PERL5LIB=${OPT_DIR}/vcftools/vcftools_${VCFTOOLS_VERSION}/perl/
-if [ ! -s ${OPT_DIR}/vcftools/vcftools ]; then
+if [ ! -s ${VCF_ANNOTATE_EXE} ]; then
     mkdir -p ${OPT_DIR}/vcftools
     cd ${OPT_DIR}/vcftools
 	wget http://downloads.sourceforge.net/project/vcftools/vcftools_${VCFTOOLS_VERSION}.tar.gz
@@ -583,7 +583,7 @@ do
             -selectType INDEL \
             -o ${unfiltered_vcf_fn} 2> /dev/null
     fi
-    if [ ! -s ${filtered_vcf_fn} ]; then
+    if [ ! -s ${filtered_vcf_fn}.gz ]; then
         ${GATK_EXE} \
             -T ApplyRecalibration \
             -R ${REF_GENOME} \
@@ -625,7 +625,7 @@ do
             --variant ${filtered_vcf_fn} \
             --snpEffFile ${snpeff_vcf_fn} \
             -o ${snpeff_annotated_vcf_fn} \
-            2> /dev/null
+            # 2> /dev/null
     fi
     if [ ! -s ${annotated_vcf_fn} ]; then
         cat ${snpeff_annotated_vcf_fn} \
