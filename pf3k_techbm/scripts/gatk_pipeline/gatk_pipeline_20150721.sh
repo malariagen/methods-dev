@@ -365,7 +365,7 @@ do
             if [ -f ${gvcf_list_filename} ]; then
                 rm ${gvcf_list_filename}
             fi
-            combined_gvcf_fn="${PROCESSED_DATA_DIR}/gvcf/combined_gvcf/combined.${chromosome}.${batch_index}.g.vcf"
+            combined_gvcf_fn="${PROCESSED_DATA_DIR}/vcfs/gvcf/combined_gvcf/combined.${chromosome}.${batch_index}.g.vcf"
             touch ${combined_gvcf_list_filename}
             echo ${combined_gvcf_fn} >> ${combined_gvcf_list_filename}
         fi
@@ -373,6 +373,7 @@ do
         gvcf_fn="${PROCESSED_DATA_DIR}/vcfs/gvcf/samples/${sample_name}.raw.snps.indels.${chromosome}.g.vcf"
         touch ${gvcf_list_filename}
         echo ${gvcf_fn} >> ${gvcf_list_filename}
+        echo ${position_in_batch} ${GVCF_BATCH_SIZE} ${sample_index} ${number_of_samples}
         if [ ${position_in_batch} == ${GVCF_BATCH_SIZE} ] || [ ${sample_index} == ${number_of_samples} ]; then
             if [ ! -s ${combined_gvcf_fn} ]; then
                 ${GATK_EXE} \
