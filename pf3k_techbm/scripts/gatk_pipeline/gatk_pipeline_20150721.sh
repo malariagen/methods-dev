@@ -20,9 +20,12 @@
 
 # directories
 export ORIGINAL_DIR=`pwd`
-export PROCESSED_DATA_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/assembled_samples"
-export REF_GENOME_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/Pf3D7_GeneDB"
-export OPT_DIR="$HOME/src/github/malariagen/methods-dev/pf3k_techbm/opt"
+export PROCESSED_DATA_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild_2/assembled_samples"
+export REF_GENOME_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild_2/Pf3D7_GeneDB"
+export OPT_DIR="$HOME/src/github/malariagen/methods-dev/pf3k_techbm/opt_2"
+# export PROCESSED_DATA_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/assembled_samples"
+# export REF_GENOME_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/Pf3D7_GeneDB"
+# export OPT_DIR="$HOME/src/github/malariagen/methods-dev/pf3k_techbm/opt"
 export SNPEFF_DIR="${OPT_DIR}/snpeff/snpEff"
 export CROSSES_DIR="/nfs/team112_internal/oxford_mirror/data/plasmodium/pfalciparum/pf-crosses/data/public/1.0"
 
