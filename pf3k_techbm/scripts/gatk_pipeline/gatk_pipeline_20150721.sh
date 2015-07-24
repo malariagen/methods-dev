@@ -489,9 +489,11 @@ do
             --variant ${combined_gvcf_list_filename} \
             --max_alternate_alleles ${MAX_ALTERNATE_ALLELES} \
             --annotation QualByDepth \
+            --annotation FisherStrand \
+            --annotation StrandOddsRatio \
             --annotation VariantType \
             -o ${genotyped_vcf_fn}
-		 # 2> /dev/null
+         # 2> /dev/null
     fi
 done
 
@@ -571,7 +573,7 @@ do
             --ts_filter_level 99.5 \
             -mode SNP \
             -o ${filtered_vcf_fn}
-		# 2> /dev/null
+        # 2> /dev/null
         bgzip -f ${filtered_vcf_fn}
         tabix -p vcf -f ${filtered_vcf_fn}.gz
     fi
@@ -597,7 +599,7 @@ do
             --ts_filter_level 99.0 \
             -mode INDEL \
             -o ${filtered_vcf_fn}
-		 2> /dev/null
+         2> /dev/null
         bgzip -f ${filtered_vcf_fn}
         tabix -p vcf -f ${filtered_vcf_fn}.gz
     fi
