@@ -167,8 +167,8 @@ fi
 
 if [ ! -s ${REF_GENOME} ]; then
     wget ${REF_GENOME_FASTA_URL} -O ${REF_GENOME}
-    gunzip ${REF_GENOME}.gz
-    sed -n '/>PF_apicoplast_genome_1/,$ p' ${APICOPLAST_REF_GENOME_FASTA} >> ${REF_GENOME}
+    # gunzip ${REF_GENOME}.gz
+    # sed -n '/>PF_apicoplast_genome_1/,$ p' ${APICOPLAST_REF_GENOME_FASTA} >> ${REF_GENOME}
 fi
 
 # if [ ! -s ${REF_GENOME} ]; then
