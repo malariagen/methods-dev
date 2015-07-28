@@ -14,9 +14,9 @@
 # Set up envirnoment variables
 ################################################################################
 
-# # catch errors
-# set -e
-# set -o pipefail
+# catch errors
+set -e
+set -o pipefail
 
 # directories
 export ORIGINAL_DIR=`pwd`
@@ -302,12 +302,12 @@ do
     read_group_info=`get_RG "${original_bam_fn}" | sed 's/\t/\\\\t/g'`
     if [ ! -s ${bwa_mem_fn} ]; then
         if [[ "${original_bam_fn}" == *.bam ]]; then
-            ${SAMTOOLS_EXE} bamshuf -uOn 128 "${original_bam_fn}" tmp | \
+            ${SAMTOOLS_EXE} bamshuf -uOn 128 "${original_bam_fn}" /tmp/tmp | \
             ${SAMTOOLS_EXE} bam2fq - | \
             ${BWA_EXE} mem -M -R "${read_group_info}" -p ${REF_GENOME} - > ${bwa_mem_fn} 2> /dev/null
         elif [[ "${original_bam_fn}" == *.cram ]]; then
             ${SAMTOOLS_EXE} view -b "${original_bam_fn}" | \
-            ${SAMTOOLS_EXE} bamshuf -uOn 128 - tmp | \
+            ${SAMTOOLS_EXE} bamshuf -uOn 128 - /tmp/tmp | \
             ${SAMTOOLS_EXE} bam2fq - | \
             ${FIRST_LAST_100BP_EXE} - | \
             ${BWA_EXE} mem -M -R "${read_group_info}" -p ${REF_GENOME} - > ${bwa_mem_fn} 2> /dev/null
@@ -329,17 +329,20 @@ do
         ${PICARD_EXE} SortSam \
             INPUT=${bwa_mem_fn} \
             OUTPUT=${sorted_fn} \
-            SORT_ORDER=coordinate #2> /dev/null
+            SORT_ORDER=coordinate \
+            TMP_DIR=/tmp #2> /dev/null
     fi
     if [ ! -s ${dedup_fn} ]; then
         ${PICARD_EXE} MarkDuplicates \
             INPUT=${sorted_fn} \
             OUTPUT=${dedup_fn} \
-            METRICS_FILE=${dedup_metrics_fn} #2> /dev/null
+            METRICS_FILE=${dedup_metrics_fn} \
+            TMP_DIR=/tmp #2> /dev/null#2> /dev/null
     fi
     if [ ! -s ${dedup_index_fn} ]; then
         ${PICARD_EXE} BuildBamIndex \
-            INPUT=${dedup_fn} #2> /dev/null
+            INPUT=${dedup_fn} \
+            TMP_DIR=/tmp #2> /dev/null#2> /dev/null
     fi
 done
 
@@ -388,7 +391,7 @@ do
             -knownSites ${CROSSES_DIR}/3d7_hb3.combined.final.vcf.gz \
             -o ${recal_table_fn} 2> /dev/null
     fi
-	# Note the following is in recommended best practices, but makes no difference to 
+    # Note the following is in recommended best practices, but makes no difference to 
     # if [ ! -s ${post_recal_table_fn} ]; then
     #     ${GATK_EXE} \
     #         -T BaseRecalibrator \
