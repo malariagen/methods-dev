@@ -329,17 +329,17 @@ do
         ${PICARD_EXE} SortSam \
             INPUT=${bwa_mem_fn} \
             OUTPUT=${sorted_fn} \
-            SORT_ORDER=coordinate 2> /dev/null
+            SORT_ORDER=coordinate #2> /dev/null
     fi
     if [ ! -s ${dedup_fn} ]; then
         ${PICARD_EXE} MarkDuplicates \
             INPUT=${sorted_fn} \
             OUTPUT=${dedup_fn} \
-            METRICS_FILE=${dedup_metrics_fn} 2> /dev/null
+            METRICS_FILE=${dedup_metrics_fn} #2> /dev/null
     fi
     if [ ! -s ${dedup_index_fn} ]; then
         ${PICARD_EXE} BuildBamIndex \
-            INPUT=${dedup_fn} 2> /dev/null
+            INPUT=${dedup_fn} #2> /dev/null
     fi
 done
 
