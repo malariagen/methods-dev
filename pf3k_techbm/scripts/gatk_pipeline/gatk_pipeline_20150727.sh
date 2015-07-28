@@ -302,12 +302,12 @@ do
     read_group_info=`get_RG "${original_bam_fn}" | sed 's/\t/\\\\t/g'`
     if [ ! -s ${bwa_mem_fn} ]; then
         if [[ "${original_bam_fn}" == *.bam ]]; then
-            ${SAMTOOLS_EXE} bamshuf -uOn 128 "${original_bam_fn}" /tmp/tmp | \
+            ${SAMTOOLS_EXE} bamshuf -uOn 128 "${original_bam_fn}" tmp | \
             ${SAMTOOLS_EXE} bam2fq - | \
             ${BWA_EXE} mem -M -R "${read_group_info}" -p ${REF_GENOME} - > ${bwa_mem_fn} 2> /dev/null
         elif [[ "${original_bam_fn}" == *.cram ]]; then
             ${SAMTOOLS_EXE} view -b "${original_bam_fn}" | \
-            ${SAMTOOLS_EXE} bamshuf -uOn 128 - /tmp/tmp | \
+            ${SAMTOOLS_EXE} bamshuf -uOn 128 - tmp | \
             ${SAMTOOLS_EXE} bam2fq - | \
             ${FIRST_LAST_100BP_EXE} - | \
             ${BWA_EXE} mem -M -R "${read_group_info}" -p ${REF_GENOME} - > ${bwa_mem_fn} 2> /dev/null
