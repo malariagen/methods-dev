@@ -21,6 +21,7 @@ set -o pipefail
 # directories
 export ORIGINAL_DIR=`pwd`
 export PROCESSED_DATA_DIR="/lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2"
+export TEMP_DIR="/lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/tmp"
 export REF_GENOME_DIR="/lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/Pf3D7_PlasmoDB"
 export OPT_DIR="$HOME/src/github/malariagen/methods-dev/pf3k_techbm/opt_3"
 # export PROCESSED_DATA_DIR="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/assembled_samples"
@@ -271,6 +272,9 @@ fi
 if [ ! -d "${PROCESSED_DATA_DIR}/vcfs/vcf/recal" ]; then
     mkdir -p "${PROCESSED_DATA_DIR}/vcfs/vcf/recal"
 fi
+if [ ! -d "${TEMP_DIR}" ]; then
+    mkdir -p "${TEMP_DIR}"
+fi
 
 
 
@@ -330,19 +334,19 @@ do
             INPUT=${bwa_mem_fn} \
             OUTPUT=${sorted_fn} \
             SORT_ORDER=coordinate \
-            TMP_DIR=tmp #2> /dev/null
+            TMP_DIR=${TEMP_DIR} #2> /dev/null
     fi
     if [ ! -s ${dedup_fn} ]; then
         ${PICARD_EXE} MarkDuplicates \
             INPUT=${sorted_fn} \
             OUTPUT=${dedup_fn} \
             METRICS_FILE=${dedup_metrics_fn} \
-            TMP_DIR=tmp #2> /dev/null#2> /dev/null
+            TMP_DIR=${TEMP_DIR} #2> /dev/null#2> /dev/null
     fi
     if [ ! -s ${dedup_index_fn} ]; then
         ${PICARD_EXE} BuildBamIndex \
             INPUT=${dedup_fn} \
-            TMP_DIR=tmp #2> /dev/null#2> /dev/null
+            TMP_DIR=${TEMP_DIR} #2> /dev/null#2> /dev/null
     fi
 done
 

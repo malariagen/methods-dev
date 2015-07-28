@@ -113,6 +113,59 @@ fig.tight_layout()
 
 # <codecell>
 
+fig = figure(figsize=(12, 7.5))
+for i, ASSAY_ID in enumerate(tbl_sanger_sequenom
+    .distinct('ASSAY_ID')
+    .values('ASSAY_ID')
+    .array()
+):
+    print(ASSAY_ID)
+
+    alleles = (tbl_sanger_sequenom
+        .selecteq('ASSAY_ID', ASSAY_ID)
+        .distinct('ALLELE')
+        .values('ALLELE')
+        .array()
+    )
+
+    # genotypes = [alleles[0], alleles[1], alleles[0]+alleles[1], '']
+    genotypes = (tbl_sanger_sequenom
+        .selecteq('ASSAY_ID', ASSAY_ID)
+        .distinct('GENOTYPE_ID')
+        .addfield('genotype_length', lambda rec: len(rec['GENOTYPE_ID']))
+        .sort('genotype_length')
+        .values('GENOTYPE_ID')
+        .array()
+    )
+
+    ax = fig.add_subplot(3, 5, i+1)
+    for j, genotype in enumerate(insert(genotypes, 0, None)):
+        x_heights = (tbl_sanger_sequenom
+            .selecteq('ASSAY_ID', ASSAY_ID)
+            .selecteq('GENOTYPE_ID', genotype)
+            .selecteq('ALLELE', alleles[0])
+            .values('HEIGHT')
+            .array()
+        )
+        y_heights = (tbl_sanger_sequenom
+            .selecteq('ASSAY_ID', ASSAY_ID)
+            .selecteq('GENOTYPE_ID', genotype)
+            .selecteq('ALLELE', alleles[1])
+            .values('HEIGHT')
+            .array()
+        )
+        ax.scatter(x_heights, y_heights, color=genotype_colours[j], alpha=0.5, label=genotype)
+        assay_split=ASSAY_ID.split('_')
+        assay_title = ASSAY_ID if not ASSAY_ID.startswith('Pf') else "%s %s" % (
+            '_'.join((assay_split[3], assay_split[4], assay_split[5])),
+            assay_split[6]
+        )
+        ax.set_title(assay_title)
+
+fig.tight_layout()
+
+# <codecell>
+
 (tbl_sanger_sequenom
 .convertnumbers()
 .selecteq('ASSAY_ID', 'gb_CM000450_1697797')
