@@ -330,19 +330,19 @@ do
             INPUT=${bwa_mem_fn} \
             OUTPUT=${sorted_fn} \
             SORT_ORDER=coordinate \
-            TMP_DIR=/tmp #2> /dev/null
+            TMP_DIR=tmp #2> /dev/null
     fi
     if [ ! -s ${dedup_fn} ]; then
         ${PICARD_EXE} MarkDuplicates \
             INPUT=${sorted_fn} \
             OUTPUT=${dedup_fn} \
             METRICS_FILE=${dedup_metrics_fn} \
-            TMP_DIR=/tmp #2> /dev/null#2> /dev/null
+            TMP_DIR=tmp #2> /dev/null#2> /dev/null
     fi
     if [ ! -s ${dedup_index_fn} ]; then
         ${PICARD_EXE} BuildBamIndex \
             INPUT=${dedup_fn} \
-            TMP_DIR=/tmp #2> /dev/null#2> /dev/null
+            TMP_DIR=tmp #2> /dev/null#2> /dev/null
     fi
 done
 
