@@ -32,7 +32,7 @@ for i in range(int(len(imeta_out)/3)):
         combined_file_cmd = "tail -n +2 %s >> %s" % (local_path, combined_data_fn)
     _ = subprocess.call(combined_file_cmd, shell=True)
 
-tbl_sample_mappings = etl.fromxls(sample_mappings_fn)
+tbl_sample_mappings = etl.fromxls(sample_mappings_fn).skip(8)
 
 tbl_processed = (etl.fromtsv(combined_data_fn)
     .convertnumbers()
