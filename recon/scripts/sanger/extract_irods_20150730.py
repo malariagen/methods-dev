@@ -41,7 +41,7 @@ tbl_processed = (etl.fromtsv(combined_data_fn)
     .leftjoin(tbl_sample_mappings, lkey='SAMPLE_ID', rkey='SANGER SAMPLE ID')
     .cutout('SAMPLE_ID')
     .rename('SUPPLIER SAMPLE NAME', 'SAMPLE_ID')
-    .convert('SUPPLIER SAMPLE NAME', lambda rec: rec+'X')
+    .convert('SAMPLE_ID', lambda rec: rec+'X')
     .rename('STATUS', 'DESCRIPTION')
     .cut(['CUSTOMER', 'PROJECT', 'PLATE', 'EXPERIMENT', 'CHIP', 'WELL_POSITION',
     'ASSAY_ID', 'GENOTYPE_ID', 'DESCRIPTION', 'SAMPLE_ID', 'ALLELE', 'MASS',
