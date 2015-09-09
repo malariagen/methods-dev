@@ -23,6 +23,7 @@ PF_SOLARIS_FN = '../../meta/Pf/PF_samples_Richard_RDP.xlsx'
 ASSEMBLED_SAMPLES_FN = '../meta/PacBio samples draft 26062015_RDP_20150706.xlsx'
 PROCESSED_ASSEMBLED_SAMPLES_DIR = '/nfs/team112_internal/production_files/Pf3k/methods/assembled_samples'
 !mkdir {PROCESSED_ASSEMBLED_SAMPLES_DIR}
+VRPIPE_ASSEMBLED_SAMPLES_DIR = ''
 
 # DATA_DIR = '../meta/20150617'
 CACHE_DIR = '../meta/cache'
