@@ -1,0 +1,97 @@
+################################################################################################
+# Pf3D7_01_v3:136681 - missing in Dushi but not in manual
+################################################################################################
+
+# The following shows this is neither SNP nor INDEL, hence was removed by SelectVariants
+
+########################
+# Actual file used in 20150907_assess_validation.ipynb analysis (on MacBook)
+########################
+grep 136681 /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/gvcf/combined_gvcf/combined.Pf3D7_01_v3.0.g.vcf
+grep 136681 /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/gvcf/combined_gvcf/combined.Pf3D7_01_v3.1.g.vcf
+grep 136681 /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/vcf/raw.snps.indels.Pf3D7_01_v3.vcf
+grep 136681 /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/vcf/unfiltered.SNP.Pf3D7_01_v3.vcf
+grep 136681 /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/vcf/unfiltered.INDEL.Pf3D7_01_v3.vcf
+
+dhcp266:GATKbuild rpearson$ grep 136681 /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/gvcf/combined_gvcf/combined.Pf3D7_01_v3.0.g.vcf
+Pf3D7_01_v3	136681	.	G	GATATCTTCTTTACCATGA,<NON_REF>	.	.	DP=188;MQ=57.97	GT:AD:DP:GQ:PL:SB	./.:0,17,0:17:68:975,68,0,976,69,976:0,0,9,8	./.:0,14,0:14:55:851,55,0,853,57,855:0,0,7,7	./.:0,66,0:66:99:4323,293,0,4333,304,4344:0,0,22,44
+dhcp266:GATKbuild rpearson$ grep 136681 /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/gvcf/combined_gvcf/combined.Pf3D7_01_v3.1.g.vcf
+Pf3D7_01_v3	136681	.	G	A,GATATCTTCTTTACCATGA,<NON_REF>	.	.	DP=180;MQ=56.95	GT:AD:DP:GQ:PGT:PID:PL:SB	./.:0,17,0,0:17:53:0|1:136671_C_CTTT:771,53,0,771,53,771,771,53,771,771:0,0,9,8	./.:0,0,71,0:71:99:.:.:4749,4765,4781,312,328,0,4765,4781,328,4781:0,0,39,32
+dhcp266:GATKbuild rpearson$ grep 136681 /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/vcf/raw.snps.indels.Pf3D7_01_v3.vcf
+Pf3D7_01_v3	136681	.	G	GATATCTTCTTTACCATGA,A	11643.68	.	AC=8,2;AF=0.800,0.200;AN=10;DP=368;FS=0.000;MLEAC=8,2;MLEAF=0.800,0.200;MQ=57.97;QD=27.95;SOR=0.842	GT:AD:DP:GQ:PGT:PID:PL	1/1:0,17,0:17:68:.:.:975,68,0,976,69,976	2/2:0,0,17:17:53:1|1:136671_C_CTTT:771,771,771,53,53,0	1/1:0,14,0:14:55:.:.:851,55,0,853,57,855	1/1:0,66,0:66:99:.:.:4323,293,0,4333,304,4344	1/1:0,71,0:71:99:.:.:4749,312,0,4765,328,4781
+dhcp266:GATKbuild rpearson$ grep 136681 /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/vcf/unfiltered.SNP.Pf3D7_01_v3.vcf
+dhcp266:GATKbuild rpearson$ grep 136681 /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/vcf/unfiltered.INDEL.Pf3D7_01_v3.vcf
+Pf3D7_01_v3	136681	.	G	GATATCTTCTTTACCATGA,A	11643.68	.	AC=8,2;AF=0.800,0.200;AN=10;DP=368;FS=0.000;MLEAC=8,2;MLEAF=0.800,0.200;MQ=57.97;QD=27.95;SOR=0.842	GT:AD:DP:GQ:PGT:PID:PL	1/1:0,17,0:17:68:.:.:975,68,0,976,69,976	2/2:0,0,17:17:53:1|1:136671_C_CTTT:771,771,771,53,53,0	1/1:0,14,0:14:55:.:.:851,55,0,853,57,855	1/1:0,66,0:66:99:.:.:4323,293,0,4333,304,4344	1/1:0,71,0:71:99:.:.:4749,312,0,4765,328,4781
+
+########################
+# gatk_pipeline_20150727.sh output (on malsrv2)
+########################
+
+grep 136681 /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/gvcf/combined_gvcf/combined.Pf3D7_01_v3.1.g.vcf
+grep 136681 /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/gvcf/combined_gvcf/combined.Pf3D7_01_v3.2.g.vcf
+grep 136681 /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/vcf/raw.snps.indels.Pf3D7_01_v3.vcf
+grep 136681 /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/vcf/unfiltered.SNP.Pf3D7_01_v3.vcf
+grep 136681 /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/vcf/unfiltered.INDEL.Pf3D7_01_v3.vcf
+
+malsrv2[rp7]23: grep 136681 /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/gvcf/combined_gvcf/combined.Pf3D7_01_v3.1.g.vcf
+Pf3D7_01_v3	136681	.	G	A,GATATCTTCTTTACCATGA,<NON_REF>	.	.	DP=315;MQ=56.20	GT:AD:DP:GQ:PGT:PID:PL:SB	./.:0,17,0,0:17:53:0|1:136671_C_CTTT:771,53,0,771,53,771,771,53,771,771:0,0,9,8	./.:0,0,66,0:66:99:.:.:4323,4333,4344,293,304,0,4333,4344,304,4344:0,0,22,44	./.:0,0,71,0:71:99:.:.:4749,4765,4781,312,328,0,4765,4781,328,4781:0,0,39,32
+malsrv2[rp7]24: grep 136681 /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/gvcf/combined_gvcf/combined.Pf3D7_01_v3.2.g.vcf
+Pf3D7_01_v3	136681	.	G	GATATCTTCTTTACCATGA,<NON_REF>	.	.	DP=53;MQ=58.90	GT:AD:DP:GQ:PL:SB	./.:0,17,0:17:68:975,68,0,976,69,976:0,0,9,8	./.:0,14,0:14:55:851,55,0,853,57,855:0,0,7,7
+malsrv2[rp7]25: grep 136681 /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/vcf/raw.snps.indels.Pf3D7_01_v3.vcf
+Pf3D7_01_v3	136681	.	G	A,GATATCTTCTTTACCATGA	11643.68	.	DP=368;FS=0.000;MLEAC=2,8;MLEAF=0.200,0.800;MQ=58.90;QD=35.44;SOR=0.842;VariantType=MULTIALLELIC_MIXED	GT:AD:DP:GQ:PGT:PID:PL	2/2:0,0,17:17:68:.:.:975,976,976,68,69,0	1/1:0,17,0:17:53:1|1:136671_C_CTTT:771,53,0,771,53,771	2/2:0,0,14:14:55:.:.:851,853,855,55,57,0	2/2:0,0,66:66:99:.:.:4323,4333,4344,293,304,0	2/2:0,0,71:71:99:.:.:4749,4765,4781,312,328,0
+malsrv2[rp7]26: grep 136681 /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/vcf/unfiltered.SNP.Pf3D7_01_v3.vcf
+malsrv2[rp7]27: grep 136681 /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/vcf/unfiltered.INDEL.Pf3D7_01_v3.vcf
+
+########################
+# Dushi file (on malsrv2)
+########################
+zgrep 136681 /lustre/scratch110/malaria/dj6/pf3k/output/combine_gvcfs2/7/6/a/9/14653/1_gatk_combine_gvcfs_gatk3/Pf3D7_01_v3_1-640851.gatk.combined.vcf.gz
+zgrep 136681 /lustre/scratch110/malaria/dj6/pf3k/output/genotype_gvcfs2/8/e/5/a/14669/1_gatk_genotype_gvcfs_gatk3/Pf3D7_01_v3_1-640851.gatk.genotyped.vcf.gz
+zgrep 136681 /lustre/scratch110/malaria/dj6/pf3k/output/select_variants_apply_recalibration_for_snps2/b/6/9/1/14686/1_gatk_select_variants_gatk3/Pf3D7_01_v3_1-640851.gatk.genotyped.selected.vcf.gz
+zgrep 136681 /lustre/scratch110/malaria/dj6/pf3k/output/select_variants_apply_recalibration_for_indels2/8/d/e/0/14686/1_gatk_select_variants_gatk3/Pf3D7_01_v3_1-640851.gatk.genotyped.selected.vcf.gz
+
+malsrv2[rp7]12: zgrep 136681 /lustre/scratch110/malaria/dj6/pf3k/output/combine_gvcfs2/7/6/a/9/14653/1_gatk_combine_gvcfs_gatk3/Pf3D7_01_v3_1-640851.gatk.combined.vcf.gz
+Pf3D7_01_v3	136681	.	G	GATATCTTCTTTACCATGA,A,<NON_REF>	.	.	DP=368;MQ=56.95	GT:AD:DP:GQ:PGT:PID:PL:SB	./.:0,66,0,0:66:99:.:.:4323,293,0,4333,304,4344,4333,304,4344,4344:0,0,22,44	./.:0,17,0,0:17:68:.:.:975,68,0,976,69,976,976,69,976,976:0,0,9,8	./.:0,0,17,0:17:53:0|1:136671_C_CTTT:771,771,771,53,53,0,771,771,53,771:0,0,9,8	./.:0,14,0,0:14:55:.:.:851,55,0,853,57,855,853,57,855,855:0,0,7,7	./.:0,71,0,0:71:99:.:.:4748,312,0,4764,328,4780,4764,328,4780,4780:0,0,39,32
+malsrv2[rp7]13: zgrep 136681 /lustre/scratch110/malaria/dj6/pf3k/output/genotype_gvcfs2/8/e/5/a/14669/1_gatk_genotype_gvcfs_gatk3/Pf3D7_01_v3_1-640851.gatk.genotyped.vcf.gz
+Pf3D7_01_v3	136681	.	G	GATATCTTCTTTACCATGA,A	11642.68	.	DP=368;FS=0.000;MLEAC=8,2;MLEAF=0.800,0.200;MQ=56.95;QD=30.81;SOR=0.842;VariantType=MULTIALLELIC_MIXED	GT:AD:DP:GQ:PGT:PID:PL	1/1:0,66,0:66:99:.:.:4323,293,0,4333,304,4344	1/1:0,17,0:17:68:.:.:975,68,0,976,69,976	2/2:0,0,17:17:53:1|1:136671_C_CTTT:771,771,771,53,53,0	1/1:0,14,0:14:55:.:.:851,55,0,853,57,855	1/1:0,71,0:71:99:.:.:4748,312,0,4764,328,4780
+malsrv2[rp7]14: zgrep 136681 /lustre/scratch110/malaria/dj6/pf3k/output/select_variants_apply_recalibration_for_snps2/b/6/9/1/14686/1_gatk_select_variants_gatk3/Pf3D7_01_v3_1-640851.gatk.genotyped.selected.vcf.gz
+malsrv2[rp7]15: zgrep 136681 /lustre/scratch110/malaria/dj6/pf3k/output/select_variants_apply_recalibration_for_indels2/8/d/e/0/14686/1_gatk_select_variants_gatk3/Pf3D7_01_v3_1-640851.gatk.genotyped.selected.vcf.gz
+
+
+################################################################################################
+# Pf3D7_01_v3:192633 - missing in manual but not in Dushi vr-pipe
+################################################################################################
+
+# The following shows that spanning deletions are marked as <*:DEL> in version of GATK used in files used for analysis, but * in latest versions.
+# Analysis script was removing <*:DEL> but not *
+
+########################
+# Actual file used (on MacBook)
+########################
+
+grep -p '\t192633\t' /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/gvcf/combined_gvcf/combined.Pf3D7_01_v3.0.g.vcf
+grep -p '\t192633\t' /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/gvcf/combined_gvcf/combined.Pf3D7_01_v3.1.g.vcf
+grep -p '\t192633\t' /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/vcf/raw.snps.indels.Pf3D7_01_v3.vcf
+grep -p '\t192633\t' /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/vcf/unfiltered.SNP.Pf3D7_01_v3.vcf
+grep -p '\t192633\t' /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/vcf/unfiltered.INDEL.Pf3D7_01_v3.vcf
+grep -p '\t192633\t' /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/vcf/filtered.annotated.Pf3D7july2015.SNP_INDEL.Pf3D7_01_v3.vcf.gz
+
+########################
+# gatk_pipeline_20150727.sh output (on malsrv2)
+########################
+
+grep -P '\t192633\t' /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/gvcf/combined_gvcf/combined.Pf3D7_01_v3.1.g.vcf
+grep -P '\t192633\t' /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/gvcf/combined_gvcf/combined.Pf3D7_01_v3.2.g.vcf
+grep -P '\t192633\t' /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/vcf/raw.snps.indels.Pf3D7_01_v3.vcf
+grep -P '\t192633\t' /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/vcf/unfiltered.SNP.Pf3D7_01_v3.vcf
+grep -P '\t192633\t' /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/vcf/unfiltered.INDEL.Pf3D7_01_v3.vcf
+grep -P '\t192633\t' /lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/vcf/filtered.SNP.Pf3D7_01_v3.vcf.gz
+
+########################
+# Dushi file (on malsrv2)
+########################
+zgrep -P '\t192633\t' /lustre/scratch110/malaria/dj6/pf3k/output/combine_gvcfs2/7/6/a/9/14653/1_gatk_combine_gvcfs_gatk3/Pf3D7_01_v3_1-640851.gatk.combined.vcf.gz
+zgrep -P '\t192633\t' /lustre/scratch110/malaria/dj6/pf3k/output/genotype_gvcfs2/8/e/5/a/14669/1_gatk_genotype_gvcfs_gatk3/Pf3D7_01_v3_1-640851.gatk.genotyped.vcf.gz
+zgrep -P '\t192633\t' /lustre/scratch110/malaria/dj6/pf3k/output/select_variants_apply_recalibration_for_snps2/b/6/9/1/14686/1_gatk_select_variants_gatk3/Pf3D7_01_v3_1-640851.gatk.genotyped.selected.vcf.gz
+zgrep -P '\t192633\t' /lustre/scratch110/malaria/dj6/pf3k/output/select_variants_apply_recalibration_for_indels2/8/d/e/0/14686/1_gatk_select_variants_gatk3/Pf3D7_01_v3_1-640851.gatk.genotyped.selected.vcf.gz
+zgrep -P '\t192633\t' /lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/3/2/e/7/14734/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_01_v3.combined.vcf.gz
