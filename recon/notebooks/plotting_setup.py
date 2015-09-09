@@ -8,6 +8,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from matplotlib.gridspec import GridSpec
+from matplotlib.backends.backend_pdf import PdfPages
 import seaborn as sns
 sns.set_context('paper')
 sns.set_style('white')

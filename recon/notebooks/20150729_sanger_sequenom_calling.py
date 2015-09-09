@@ -20,6 +20,7 @@ sample_mappings_fn = '/nfs/team112_internal/rp7/recon/sanger_sequenom/sample_map
 illumina_vcf_fn = PGV4_VCF_FN
 ref_genome_fn = REF_GENOME
 cache_dir_format = '%s/cache_data/%s'
+plot_dir_format = '%s/plots/%s'
 
 # <codecell>
 
@@ -28,7 +29,22 @@ cache_dir_format = '%s/cache_data/%s'
 
 # import brewer2mpl
 # set1 = brewer2mpl.get_map('Set1', 'qualitative', 8).mpl_colors
-genotype_colours = ['lightgray', 'black', 'red', 'blue', 'green']
+genotype_colours = ['orange', 'lightgray', 'darkred', 'darkgreen', 'darkblue']
+# genotype_colours_water = ['black', 'lightgray', 'red', 'green', 'blue']
+genotype_colours_water = ['black', 'lightgray', 'fuchsia', 'chartreuse', 'cyan']
+named_genotype_colours = collections.OrderedDict()
+named_genotype_colours['./.'] = 'orange'
+named_genotype_colours['?'] = 'lightgray'
+named_genotype_colours['0/0'] = 'darkred'
+named_genotype_colours['1/1'] = 'darkgreen'
+named_genotype_colours['0/1'] = 'darkblue'
+named_genotype_colours_water = collections.OrderedDict()
+named_genotype_colours_water['./.'] = 'black'
+named_genotype_colours_water['?'] = 'lightgray'
+named_genotype_colours_water['0/0'] = 'fuchsia'
+named_genotype_colours_water['1/1'] = 'chartreuse'
+named_genotype_colours_water['0/1'] = 'cyan'
+
 # genotype_colours = ['lightgray', 'black', 'red', 'blue', 'green']
 
 # <headingcell level=1>
@@ -39,7 +55,7 @@ genotype_colours = ['lightgray', 'black', 'red', 'blue', 'green']
 
 def determine_GT(AD):
     if sum(AD) < 5:
-        return(None)
+        return("./.")
     if len(AD) == 3:
         if AD[0] > 1 and AD[1] > 1:
             return("0/1")
@@ -60,7 +76,7 @@ def determine_GT(AD):
 # <codecell>
 
 def calc_low_intensity(x=3, y=2, theta=45):
-    if x is None:
+    if x is None or x==0:
         return None
     else:
         tan_sq_theta = math.tan(math.radians(theta))**2
@@ -229,11 +245,11 @@ def cache_illumina(illumina_vcf_fn, tbl_sanger_sequenom, plate_name, rewrite=Fal
 
 # <codecell>
 
-tbl_illumina = cache_illumina(illumina_vcf_fn, tbl_sanger_sequenom, plate_name, rewrite=False)
+tbl_illumina = cache_illumina(illumina_vcf_fn, tbl_sanger_sequenom, plate_name, rewrite=True)
 
 # <codecell>
 
-tbl_illumina
+tbl_illumina.valuecounts('illumina_gt')
 
 # <codecell>
 
@@ -285,7 +301,9 @@ def cache_calling_parameters(calling_parameters_fn, plate_name, rewrite=False):
 # <codecell>
 
 def determine_sequenom_gt(rec):
-    if(rec['ref'] is None or rec['SEQUENOM_GENOTYPE'] is None or rec['SEQUENOM_GENOTYPE'] == ''):
+    if(rec['ref'] is None):
+        return('?')
+    elif(rec['ref'] is None or rec['SEQUENOM_GENOTYPE'] is None or rec['SEQUENOM_GENOTYPE'] == ''):
         return('./.')
     elif(rec['SEQUENOM_GENOTYPE'] == rec['ref']):
         return('0/0')
@@ -294,14 +312,14 @@ def determine_sequenom_gt(rec):
     elif(rec['SEQUENOM_GENOTYPE'] == rec['ref']+rec['alt'] or rec['SEQUENOM_GENOTYPE'] == rec['alt']+rec['ref']):
         return('0/1')
     else:
-        return('?/?')
+        return('error')
     
 
 # <codecell>
 
 def determine_called_genotype(rec):
     if rec['INTENSITY'] is None or rec['THETA'] is None or rec['low_intensity_cutoff'] is None or rec['genotype_threshold_degrees_1'] is None or rec['genotype_threshold_degrees_2'] is None:
-        return(None)
+        return('?')
     elif rec['INTENSITY'] < rec['low_intensity_cutoff']:
         return('')
     elif rec['THETA'] < rec['genotype_threshold_degrees_1']:
@@ -315,18 +333,18 @@ def determine_called_genotype(rec):
 
 def determine_called_gt(rec):
     if rec['INTENSITY'] is None or rec['THETA'] is None or rec['low_intensity_cutoff'] is None or rec['genotype_threshold_degrees_1'] is None or rec['genotype_threshold_degrees_2'] is None:
-        return(None)
-    elif rec['ref'] is None:
-        return(None)
+        return('?')
+#     elif rec['ref'] is None:
+#         return(None)
     elif rec['INTENSITY'] < rec['low_intensity_cutoff']:
         return('./.')
     elif rec['THETA'] < rec['genotype_threshold_degrees_1']:
-        if rec['ALLELE_1'] == rec['ref']:
+        if rec['ref'] is None or rec['ALLELE_1'] == rec['ref']:
             return('0/0')
         else:
             return('1/1')
     elif rec['THETA'] > rec['genotype_threshold_degrees_2']:
-        if rec['ALLELE_1'] == rec['ref']:
+        if rec['ref'] is None or rec['ALLELE_1'] == rec['ref']:
             return('1/1')
         else:
             return('0/0')
@@ -335,25 +353,52 @@ def determine_called_gt(rec):
 
 # <codecell>
 
-def determine_illumina_gt(rec):
-    if rec['INTENSITY'] is None or rec['THETA'] is None or rec['low_intensity_cutoff'] is None or rec['genotype_threshold_degrees_1'] is None or rec['genotype_threshold_degrees_2'] is None:
-        return(None)
-    elif rec['ref'] is None:
-        return(None)
-    elif rec['INTENSITY'] < rec['low_intensity_cutoff']:
-        return('./.')
-    elif rec['THETA'] < rec['genotype_threshold_degrees_1']:
-        if rec['ALLELE_1'] == rec['ref']:
-            return('0/0')
-        else:
-            return('1/1')
-    elif rec['THETA'] > rec['genotype_threshold_degrees_2']:
-        if rec['ALLELE_1'] == rec['ref']:
-            return('1/1')
-        else:
-            return('0/0')
+# def determine_illumina_gt(rec):
+#     if rec['INTENSITY'] is None or rec['THETA'] is None or rec['low_intensity_cutoff'] is None or rec['genotype_threshold_degrees_1'] is None or rec['genotype_threshold_degrees_2'] is None:
+#         return(None)
+#     elif rec['ref'] is None:
+#         return(None)
+#     elif rec['INTENSITY'] < rec['low_intensity_cutoff']:
+#         return('./.')
+#     elif rec['THETA'] < rec['genotype_threshold_degrees_1']:
+#         if rec['ALLELE_1'] == rec['ref']:
+#             return('0/0')
+#         else:
+#             return('1/1')
+#     elif rec['THETA'] > rec['genotype_threshold_degrees_2']:
+#         if rec['ALLELE_1'] == rec['ref']:
+#             return('1/1')
+#         else:
+#             return('0/0')
+#     else:
+#         return('0/1')
+
+# <codecell>
+
+def determine_illumina_genotype(rec):
+    if rec['illumina_gt'] == '0/0':
+        return(rec['ref'])
+    elif rec['illumina_gt'] == '1/1':
+        return(rec['alt'])
+    elif rec['illumina_gt'] == '0/1':
+        return(rec['ref']+rec['alt'])
+    elif rec['illumina_gt'] == './.':
+        return('')
     else:
-        return('0/1')
+        return('?')
+
+# <codecell>
+
+def determine_theta(rec):
+    if rec['HEIGHT_1'] == 0 and rec['HEIGHT_2'] == 0:
+        return(np.float64(0.0))
+    else:
+        return(math.degrees(math.atan(np.float64(rec['HEIGHT_2'])/np.float64(rec['HEIGHT_1']))))
+
+# <codecell>
+
+def determine_intensity(rec):
+    return(math.sqrt(math.pow(np.float64(rec['HEIGHT_1']), 2) + math.pow(np.float64(rec['HEIGHT_2']), 2)))
 
 # <codecell>
 
@@ -384,11 +429,13 @@ def cache_calling_results(tbl_sanger_sequenom, tbl_calling_parameters, tbl_illum
         tbl_calling_results = (
             tbl_first_allele
             .annex(tbl_second_allele)
-            .addfield('THETA', lambda rec: math.degrees(math.atan(np.float64(rec['HEIGHT_2'])/np.float64(rec['HEIGHT_1']))))
-            .addfield('INTENSITY', lambda rec: math.sqrt(math.pow(np.float64(rec['HEIGHT_1']), 2) + math.pow(np.float64(rec['HEIGHT_2']), 2)))
+            .addfield('THETA', determine_theta)
+            .addfield('INTENSITY', determine_intensity)
+#             .addfield('THETA', lambda rec: math.degrees(math.atan(np.float64(rec['HEIGHT_2'])/np.float64(rec['HEIGHT_1']))))
+#             .addfield('INTENSITY', lambda rec: math.sqrt(math.pow(np.float64(rec['HEIGHT_1']), 2) + math.pow(np.float64(rec['HEIGHT_2']), 2)))
             .leftjoin(tbl_calling_parameters, lkey='ASSAY_ID', rkey='assay_code')
             .addfield('low_intensity_cutoff', lambda rec: calc_low_intensity(rec['low_intensity_cutoff_1'], rec['low_intensity_cutoff_2'], rec['THETA']))
-            .addfield('genotype', determine_genotype)
+#             .addfield('genotype', determine_genotype)
 #             .addfield('species', determine_species)
 #             .addfield('chrom', determine_chrom)
 #             .addfield('pos', determine_pos)
@@ -398,10 +445,20 @@ def cache_calling_results(tbl_sanger_sequenom, tbl_calling_parameters, tbl_illum
             .addfield('called_genotype', determine_called_genotype)
             .addfield('called_gt', determine_called_gt)
             .leftjoin(tbl_illumina, lkey=('chrom', 'pos', 'recon_id'), rkey=('CHROM', 'POS', 'SAMPLE'))
+            .replace('illumina_gt', None, '?')
+            .addfield('illumina_genotype', determine_illumina_genotype)
         )
         tbl_calling_results.topickle(cache_fn)
     return etl.frompickle(cache_fn)
     
+
+# <codecell>
+
+np.float64(0)/np.float64(0)
+
+# <codecell>
+
+tbl_calling_results.selecteq('species', 'Pv').selectne('HEIGHT_1', 0)
 
 # <headingcell level=1>
 
@@ -431,7 +488,7 @@ tbl_calling_results = cache_calling_results(tbl_sanger_sequenom, tbl_calling_par
 
 # <codecell>
 
-tbl_calling_results.valuecounts('sequenom_gt', 'called_gt').displayall()
+tbl_calling_results.valuecounts('called_genotype', 'called_gt').displayall()
 
 # <codecell>
 
@@ -540,87 +597,171 @@ tbl_results.valuecounts('SEQUENOM_GENOTYPE', 'genotype', 'ALLELE_1', 'ALLELE_2')
 
 # <codecell>
 
-fig = figure(figsize=(12, 7.5))
-for i, ASSAY_ID in enumerate(tbl_results
-    .distinct('ASSAY_ID')
-    .values('ASSAY_ID')
-    .array()
-):
-    print(ASSAY_ID)
-    fields_of_interest = ['genotype_threshold_degrees_1', 'genotype_threshold_degrees_2',
-                          'low_intensity_cutoff_1', 'low_intensity_cutoff_2']
-    (gtd1, gtd2, lic1, lic2) = tbl_calling_parameters.selecteq('assay_code', ASSAY_ID).cut(fields_of_interest).data()[0]
+tbl_calling_results.valuecounts('recon_id').displayall()
 
-#     alleles = (tbl_results
-#         .selecteq('ASSAY_ID', ASSAY_ID)
-#         .distinct('ALLELE')
-#         .values('ALLELE')
-#         .array()
-#     )
+# <codecell>
 
-    # genotypes = [alleles[0], alleles[1], alleles[0]+alleles[1], '']
-    genotypes = (tbl_results
-        .selecteq('ASSAY_ID', ASSAY_ID)
-        .distinct('genotype')
-#         .addfield('genotype_length', lambda rec: len(rec['SEQUENOM_GENOTYPE']))
-#         .sort('genotype_length')
-        .values('genotype')
+# tbl_calling_results.valuecounts('ASSAY_ID', 'genotype').displayall()
+for var in ['SEQUENOM_GENOTYPE', 'sequenom_gt', 'called_genotype', 'called_gt', 'illumina_genotype', 'illumina_gt']:
+    print(var)
+    tbl_calling_results.valuecounts(var).displayall()
+
+# <codecell>
+
+def sequenom_scatter_plot(tbl_calling_results, genotype_column='SEQUENOM_GENOTYPE', water_names=['WATER', 'X'],
+                          plot_type='heights', plot_scale='full'):
+    if plot_type=='theta':
+        x_col='THETA'
+        y_col='INTENSITY'
+    else:
+        x_col='HEIGHT_1'
+        y_col='HEIGHT_2'
+    
+    fig = figure(figsize=(12, 7.5))
+    for i, ASSAY_ID in enumerate(tbl_calling_results
+        .distinct('ASSAY_ID')
+        .values('ASSAY_ID')
         .array()
-    )
+    ):
+        fields_of_interest = ['genotype_threshold_degrees_1', 'genotype_threshold_degrees_2',
+                              'low_intensity_cutoff_1', 'low_intensity_cutoff_2']
+        if len(tbl_calling_parameters.selecteq('assay_code', ASSAY_ID).data()) > 0:
+            (gtd1, gtd2, lic1, lic2) = tbl_calling_parameters.selecteq('assay_code', ASSAY_ID).cut(fields_of_interest).data()[0]
+        else:
+            (gtd1, gtd2, lic1, lic2) = (0.0, 90.0, 0.0, 0.0)
 
-    ax = fig.add_subplot(3, 5, i+1)
-    max_x = 0
-    max_y = 0
-    for j, genotype in enumerate(insert(genotypes, 0, None)):
-#         heights = (tbl_results
-#             .selecteq('ASSAY_ID', ASSAY_ID)
-#             .selecteq('SEQUENOM_GENOTYPE', genotype)
-#             .cut('HEIGHT_1', 'HEIGHT_2')
-#             .toarray()
-#         )
-        x_heights = (tbl_results
+        genotypes = (tbl_calling_results
             .selecteq('ASSAY_ID', ASSAY_ID)
-            .selecteq('genotype', genotype)
-#             .selecteq('ALLELE', alleles[0])
-            .values('HEIGHT_1')
+            .distinct(genotype_column)
+            .addfield('genotype_length', lambda rec: len(rec[genotype_column]))
+            .sort('genotype_length')
+            .values(genotype_column)
             .array()
         )
-        y_heights = (tbl_results
+        if not ('' in genotypes):
+            genotypes = np.insert(genotypes, 0, '')
+        if not ('?' in genotypes):
+            genotypes = np.insert(genotypes, 1, '?')
+
+#         print(ASSAY_ID, genotypes)
+        ax = fig.add_subplot(3, 5, i+1)
+        max_x = 0
+        max_y = 0
+#         for j, genotype in enumerate(insert(genotypes, 0, None)):
+        for j, genotype in enumerate(genotypes):
+            tbl_calling_results_this_genotype = (tbl_calling_results
+                .selecteq('ASSAY_ID', ASSAY_ID)
+                .selecteq(genotype_column, genotype)
+            )
+#             print(tbl_calling_results_this_genotype.header())
+
+# First plot waters
+            x_heights = (tbl_calling_results_this_genotype
+                .selectin('recon_id', water_names)
+                .values(x_col)
+                .array()
+            )
+            y_heights = (tbl_calling_results_this_genotype
+                .selectin('recon_id', water_names)
+                .values(y_col)
+                .array()
+            )
+            if genotype in named_genotype_colours_water:
+                genotype_colour=named_genotype_colours_water[genotype]
+            else:
+                genotype_colour=genotype_colours_water[j]
+            ax.scatter(x_heights, y_heights, color=genotype_colour, alpha=0.5, label="%s (water)" % genotype)
+
+            if len(x_heights) > 0 and np.nanmax(x_heights) > max_x:
+                max_x = np.nanmax(x_heights)
+            if len(y_heights) > 0 and np.nanmax(y_heights) > max_y:
+                max_y = np.nanmax(y_heights)
+
+# Then plot true samples
+            x_heights = (tbl_calling_results_this_genotype
+                .selectnotin('recon_id', water_names)
+                .values(x_col)
+                .array()
+            )
+            y_heights = (tbl_calling_results_this_genotype
+                .selectnotin('recon_id', water_names)
+                .values(y_col)
+                .array()
+            )
+            if genotype in named_genotype_colours:
+                genotype_colour=named_genotype_colours[genotype]
+            else:
+                genotype_colour=genotype_colours[j]
+            ax.scatter(x_heights, y_heights, color=genotype_colour, alpha=0.5, label=genotype)
+
+            if len(x_heights) > 0 and np.nanmax(x_heights) > max_x:
+                max_x = np.nanmax(x_heights)
+            if len(y_heights) > 0 and np.nanmax(y_heights) > max_y:
+                max_y = np.nanmax(y_heights)
+
+        first_row = (tbl_calling_results
             .selecteq('ASSAY_ID', ASSAY_ID)
-            .selecteq('genotype', genotype)
-#             .selecteq('ALLELE', alleles[1])
-            .values('HEIGHT_2')
-            .array()
+            .head(1)
         )
-#         ax.scatter(heights['HEIGHT_1'], heights['HEIGHT_2'], color=genotype_colours[j], alpha=0.5, label=genotype)
-        ax.scatter(x_heights, y_heights, color=genotype_colours[j], alpha=0.5, label=genotype)
-    
-#         print(x_heights)
-        
-        if len(x_heights) > 0 and np.nanmax(x_heights) > max_x:
-            max_x = np.nanmax(x_heights)
-        if len(y_heights) > 0 and np.nanmax(y_heights) > max_y:
-            max_y = np.nanmax(y_heights)
-        
-        
-        assay_split=ASSAY_ID.split('_')
-        assay_title = ASSAY_ID if not ASSAY_ID.startswith('Pf') else "%s %s" % (
-            '_'.join((assay_split[3], assay_split[4], assay_split[5])),
-            assay_split[6]
-        )
+        chrom = first_row.values('chrom')[0]
+        pos = first_row.values('pos')[0]
+        assay_title = "%s %d" % (chrom, pos)          
         ax.set_title(assay_title)
-    
-    ax.plot([0, max_x], [0, max_x*math.tan(math.radians(gtd1))], color='blue', linestyle='-', linewidth=1)
-    ax.plot([0, max_y*math.tan(math.radians(90.0-gtd2))], [0, max_y], color='red', linestyle='-', linewidth=1)
-    
-    li_x = np.linspace(0, lic1, 100)
-    li_y = np.sqrt( (lic2**2) * (1 - ( (li_x**2) / (lic1**2) ) ) )
-    ax.plot(li_x, li_y, color='black', linestyle='-', linewidth=1)
-    
-    ax.set_xlim(left=0.0)
-    ax.set_ylim(bottom=0.0)
+        
+        if plot_type=='theta':
+            ax.axvline(gtd1, color='red')
+            ax.axvline(gtd2, color='green')
 
-fig.tight_layout()
+            li_x = np.linspace(0, 90, 100)
+            li_y = np.array([calc_low_intensity(lic1, lic2, theta) for theta in li_x])
+
+            ax.plot(li_x, li_y, color='black', linestyle='-', linewidth=1)
+            
+            if plot_scale=='low_intensity':
+                ax.set_xlim(0, 90)
+                ax.set_ylim(0, 2*max(lic1, lic2))
+            else:
+                ax.set_xlim(0, 90)
+                ax.set_ylim(bottom=0)
+
+        else:
+            ax.plot([0, max_x], [0, max_x*math.tan(math.radians(gtd1))], color='red', linestyle='-', linewidth=1)
+            ax.plot([0, max_y*math.tan(math.radians(90.0-gtd2))], [0, max_y], color='green', linestyle='-', linewidth=1)
+
+            li_x = np.linspace(0, lic1, 100)
+            li_y = np.sqrt( (lic2**2) * (1 - ( (li_x**2) / (lic1**2) ) ) )
+            ax.plot(li_x, li_y, color='black', linestyle='-', linewidth=1)
+
+            if plot_scale=='low_intensity':
+                ax.set_xlim(0, 2*lic1)
+                ax.set_ylim(0, 2*lic2)
+            else:
+                ax.set_xlim(left=0.0)
+                ax.set_ylim(bottom=0.0)
+        
+#         ax.legend(ncol=2)
+
+    fig.tight_layout()
+
+# <codecell>
+
+from matplotlib.backends.backend_pdf import PdfPages
+
+# for genotype_column in ['SEQUENOM_GENOTYPE', 'sequenom_gt', 'called_genotype', 'called_gt', 'illumina_genotype', 'illumina_gt']:
+for genotype_column in ['sequenom_gt', 'called_genotype', 'called_gt', 'illumina_genotype', 'illumina_gt']:
+    plot_fn = "%s/plots_%s.pdf" % (plot_dir_format % (data_dir, plate_name), genotype_column)
+    if not os.path.exists(os.path.dirname(plot_fn)):
+        os.makedirs(os.path.dirname(plot_fn))
+    with PdfPages(plot_fn) as pdf:
+        for plot_type in ['height', 'theta']:
+            for plot_scale in ['full', 'low_intensity']:
+                print(genotype_column, plot_type, plot_scale)
+                sequenom_scatter_plot(tbl_calling_results, genotype_column, plot_type=plot_type, plot_scale=plot_scale)
+                pdf.savefig()
+
+# <codecell>
+
+sequenom_scatter_plot(tbl_calling_results, 'called_genotype', plot_type='theta')
 
 # <codecell>
 
