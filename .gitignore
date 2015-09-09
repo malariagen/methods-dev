@@ -47,6 +47,9 @@ cache
 # binaries
 opt
 pf3k_techbm/opt
+pf3k_techbm/opt_2
+pf3k_techbm/opt_3
+pf3k_techbm/opt_4
 recon/opt
 
 # data
