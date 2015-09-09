@@ -7,8 +7,8 @@
 # pipeline on the 5 validation samples
 
 # To run (ideally using screen):
-# cd $HOME/src/github/malariagen/methods-dev/pf3k_techbm/scripts
-# gatk_pipeline_20150909.sh >> ../log/gatk_pipeline_20150909.log
+# cd $HOME/src/github/malariagen/methods-dev/pf3k_techbm/scripts/gatk_pipeline
+# gatk_pipeline_20150909.sh >> ../../log/gatk_pipeline_20150909.log
 
 
 ################################################################################
