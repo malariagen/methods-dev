@@ -662,7 +662,7 @@ do
     fi
     if [ ! -s ${annotated_vcf_fn} ]; then
         cat ${snpeff_annotated_vcf_fn} \
-        | ${VCF_ANNOTATE_EXE} -a {regions_fn} \
+        | ${VCF_ANNOTATE_EXE} -a ${REGIONS_FN} \
            -d key=INFO,ID=RegionType,Number=1,Type=String,Description='The type of genome region within which the variant is found. SubtelomericRepeat: repetitive regions at the ends of the chromosomes. SubtelomericHypervariable: subtelomeric region of poor conservation between the 3D7 reference genome and other samples. InternalHypervariable: chromosome-internal region of poor conservation between the 3D7 reference genome and other samples. Centromere: start and end coordinates of the centromere genome annotation. Core: everything else.' \
            -c CHROM,FROM,TO,INFO/RegionType \
         > ${annotated_vcf_fn}
@@ -695,7 +695,7 @@ do
     fi
     if [ ! -s ${annotated_vcf_fn} ]; then
         cat ${snpeff_annotated_vcf_fn} \
-        | ${VCF_ANNOTATE_EXE} -a {regions_fn} \
+        | ${VCF_ANNOTATE_EXE} -a ${REGIONS_FN} \
            -d key=INFO,ID=RegionType,Number=1,Type=String,Description='The type of genome region within which the variant is found. SubtelomericRepeat: repetitive regions at the ends of the chromosomes. SubtelomericHypervariable: subtelomeric region of poor conservation between the 3D7 reference genome and other samples. InternalHypervariable: chromosome-internal region of poor conservation between the 3D7 reference genome and other samples. Centromere: start and end coordinates of the centromere genome annotation. Core: everything else.' \
            -c CHROM,FROM,TO,INFO/RegionType \
         > ${annotated_vcf_fn}
