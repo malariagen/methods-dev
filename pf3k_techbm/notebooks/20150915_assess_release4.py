@@ -38,42 +38,9 @@ vrpipe_vcfs['Pf3D7_13_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine
 vrpipe_vcfs['Pf3D7_14_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/9/b/3/1/14795/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_14_v3.combined.vcf.gz'
 vrpipe_vcfs['Pf_M76611'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/c/3/c/8/14796/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf_M76611.combined.vcf.gz'
 
-# vrpipe_vcfs['PF_apicoplast_genome_1'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/0/2/e/c/14733/1_gatk_combine_variants_gatk3/SNP_INDEL_PF_apicoplast_genome_1.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_01_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/3/2/e/7/14734/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_01_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_02_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/0/3/7/9/14735/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_02_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_03_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/b/0/3/d/14736/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_03_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_04_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/2/a/9/f/14737/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_04_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_05_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/9/3/b/0/14738/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_05_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_06_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/6/b/3/d/14739/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_06_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_07_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/c/e/a/1/14740/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_07_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_08_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/5/0/e/e/14741/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_08_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_09_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/7/4/7/0/14742/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_09_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_10_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/1/5/2/a/14743/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_10_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_11_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/6/3/a/2/14744/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_11_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_12_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/1/a/d/f/14745/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_12_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_13_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/2/3/7/c/14746/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_13_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_14_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/0/6/c/6/14747/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_14_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf_M76611'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/c/a/d/9/14748/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf_M76611.combined.vcf.gz'
-# vrpipe_vcfs['PF_apicoplast_genome_1'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/0/7/f/2/14526/1_gatk_combine_variants_gatk3/SNP_INDEL_PF_apicoplast_genome_1.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_01_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/e/1/1/3/14527/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_01_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_02_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/9/8/3/e/14528/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_02_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_03_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/0/e/c/c/14529/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_03_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_04_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/f/7/9/9/14530/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_04_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_05_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/a/a/a/7/14531/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_05_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_06_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/c/1/0/0/14532/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_06_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_07_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/3/8/f/2/14533/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_07_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_08_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/d/1/f/a/14534/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_08_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_09_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/9/a/0/c/14535/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_09_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_10_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/0/8/6/2/14536/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_10_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_11_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/4/e/b/6/14537/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_11_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_12_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/2/e/2/7/14538/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_12_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_13_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/0/d/e/2/14539/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_13_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf3D7_14_v3'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/2/5/7/4/14540/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_14_v3.combined.vcf.gz'
-# vrpipe_vcfs['Pf_M76611'] = '/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants/7/d/c/4/14541/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf_M76611.combined.vcf.gz'
-
 # <codecell>
 
-PLOTS_DIR = '/Users/rpearson/Documents/projects/Pf3k_techbm/slides/20150907_GATK_assessment/plots'
+PLOTS_DIR = '/Users/rpearson/Documents/projects/Pf3k_techbm/slides/20150915_assess_release4/plots'
 !mkdir -p {PLOTS_DIR}
 
 # <codecell>
@@ -243,18 +210,9 @@ def assess_validation(isolate_code='7G8', chromosome='Pf3D7_01_v3', rewrite=Fals
             .rename('ALT', 'gatk_ALTs')
             .addfield('ALT', lambda rec: str(rec[4][int(rec[11][2])-1]))
             .addfield('GATK_is_coding', lambda rec: not rec['SNPEFF_EFFECT'] is None and not rec['SNPEFF_EFFECT'] in NONCODING_EFFECTS)
-#             .cut(['CHROM', 'POS', 'REF', 'ALT', 'RegionType', 'GATK_is_coding', 'SNPEFF_AMINO_ACID_CHANGE', 'SNPEFF_EFFECT',
-#                   'SNPEFF_GENE_NAME', 'SNPEFF_IMPACT', 'SNPEFF_TRANSCRIPT_ID',
-#                   'SAMPLE', 'AD', 'DP', 'GQ', 'GT', 'VQSLOD', 'culprit'])
-#             .rename('RegionType', 'GATK_RegionType')
-#             .rename('SNPEFF_AMINO_ACID_CHANGE', 'GATK_AAChange')
-#             .rename('SNPEFF_EFFECT', 'GATK_Effect')
-#             .rename('SNPEFF_GENE_NAME', 'GATK_Gene')
-#             .rename('SNPEFF_IMPACT', 'GATK_Impact')
-#             .rename('SNPEFF_TRANSCRIPT_ID', 'GATK_Transcript')
             .rename(gatk_renames)
-            .select('ALT', lambda rec: str(rec) != '*')
 #             .select('ALT', lambda rec: str(rec) != '<*:DEL>')
+            .select('ALT', lambda rec: str(rec) != '*')
             .addfield('temp_REF', lambda rec: rec['REF'])
             .addfield('temp_ALT', lambda rec: rec['ALT'])
             .convert('REF', lambda ref, rec: trim_variants(rec['temp_REF'], rec['temp_ALT'])[0], pass_row=True)
@@ -286,17 +244,7 @@ def assess_validation(isolate_code='7G8', chromosome='Pf3D7_01_v3', rewrite=Fals
             .rename('ALT', 'vrpipe_ALTs')
             .addfield('ALT', lambda rec: str(rec[4][int(rec[11][2])-1]))
             .addfield('vrpipe_is_coding', lambda rec: not rec['SNPEFF_EFFECT'] is None and not rec['SNPEFF_EFFECT'] in NONCODING_EFFECTS)
-#             .cut(['CHROM', 'POS', 'REF', 'ALT', 'RegionType', 'GATK_is_coding', 'SNPEFF_AMINO_ACID_CHANGE', 'SNPEFF_EFFECT',
-#                   'SNPEFF_GENE_NAME', 'SNPEFF_IMPACT', 'SNPEFF_TRANSCRIPT_ID',
-#                   'SAMPLE', 'AD', 'DP', 'GQ', 'GT', 'VQSLOD', 'culprit'])
-#             .rename('RegionType', 'GATK_RegionType')
-#             .rename('SNPEFF_AMINO_ACID_CHANGE', 'GATK_AAChange')
-#             .rename('SNPEFF_EFFECT', 'GATK_Effect')
-#             .rename('SNPEFF_GENE_NAME', 'GATK_Gene')
-#             .rename('SNPEFF_IMPACT', 'GATK_Impact')
-#             .rename('SNPEFF_TRANSCRIPT_ID', 'GATK_Transcript')
             .rename(vrpipe_renames)
-#             .select('ALT', lambda rec: str(rec) != '<*:DEL>')
             .select('ALT', lambda rec: str(rec) != '*')
             .addfield('temp_REF', lambda rec: rec['REF'])
             .addfield('temp_ALT', lambda rec: rec['ALT'])
@@ -311,8 +259,6 @@ def assess_validation(isolate_code='7G8', chromosome='Pf3D7_01_v3', rewrite=Fals
     else:
         tbl_vrpipe = etl.frompickle(tbl_vrpipe_cache_fn)
         
-#     tbl_vrpipe.display()
-
     if not os.path.exists(tbl_comparison_cache_fn) or rewrite:
         truth_coords_fn = "%s/Pf%s.filter.coords" % (
             '/nfs/pathogen003/tdo/Pfalciparum/PF3K/Reference12Genomes/Sharing_25Jun2015/SNP/',
@@ -336,22 +282,11 @@ def assess_validation(isolate_code='7G8', chromosome='Pf3D7_01_v3', rewrite=Fals
             .addfield('IsInTruth', lambda rec: rec['Truth_RegionType'] is not None)
             .addfield('IsInGATK', lambda rec: rec['gatk_RegionType'] is not None)
             .addfield('IsInVRPIPE', lambda rec: rec['vrpipe_RegionType'] is not None)
-#             .addfield('RegionType', lambda rec: determine_consensus_region2(rec, 4, 41, 79))
             .addfield('RegionType', lambda rec: determine_consensus_region2(rec, 'Truth_RegionType', 'gatk_RegionType', 'vrpipe_RegionType'))
-#             .addfield('IsCoding', lambda rec: determine_consensus_region2(rec, 5, 55, 88))
             .addfield('IsCoding', lambda rec: determine_consensus_region2(rec, 'Truth_is_coding', 'GATK_is_coding', 'vrpipe_is_coding'))
-#             .addfield('Effect', lambda rec: determine_consensus_region2(rec, 7, 44, 80))
             .addfield('Effect', lambda rec: determine_consensus_region2(rec, 'Truth_Effect', 'gatk_SNPEFF_EFFECT', 'vrpipe_SNPEFF_EFFECT'))
-#             .addfield('AAChange', lambda rec: determine_consensus_region(rec, 6, 17))
-#             .addfield('Gene', lambda rec: determine_consensus_region(rec, 8, 19))
-#             .addfield('Impact', lambda rec: determine_consensus_region(rec, 9, 20))
-#             .addfield('Transcript', lambda rec: determine_consensus_region(rec, 10, 21))
             .addfield('mode', lambda rec: determine_consensus_region2(rec, 'Truth_mode', 'GATK_mode', 'vrpipe_mode'))
-#             .addfield('mode', lambda rec: determine_consensus_region2(rec, 14, 61, 92))
             .addfield('IsAccessible', lambda rec: len(lkp.search(rec['POS'])) > 0)
-#             .cut(['CHROM', 'POS', 'REF', 'ALT', 'IsInTruth', 'IsInGATK', 'VQSLOD', 'RegionType', 'IsCoding', 'Effect', 'AAChange', 'Gene', 'Impact', 'Transcript',
-#                   'SAMPLE', 'AD', 'DP', 'GQ', 'GT', 'culprit',
-#                   'Truth_distance_nearest', 'GATK_distance_nearest', 'IsAccessible', 'mode'])
             .sort('gatk_VQSLOD', reverse=True)
         )
         etl.topickle(tbl_comparison, tbl_comparison_cache_fn)
@@ -359,81 +294,6 @@ def assess_validation(isolate_code='7G8', chromosome='Pf3D7_01_v3', rewrite=Fals
         tbl_comparison = etl.frompickle(tbl_comparison_cache_fn)
         
     return(tbl_comparison)
-
-# <codecell>
-
-tbl_comparison_7g8_Pf3D7_01_v3 = assess_validation(rewrite=True)
-
-# <codecell>
-
-tbl_comparison_7g8_Pf3D7_01_v3.valuecounts('IsInGATK', 'IsInVRPIPE').displayall()
-
-# <codecell>
-
-tbl_comparison_KE01_Pf3D7_01_v3 = assess_validation('KE01', rewrite=True)
-
-# <codecell>
-
-tbl_comparison_KE01_Pf3D7_01_v3
-
-# <codecell>
-
-tbl_comparison_7g8_Pf3D7_01_v3.display(index_header=True)
-
-# <codecell>
-
-tbl_comparison_7g8_Pf3D7_01_v3.valuecounts('Truth_is_coding', 'GATK_is_coding', 'vrpipe_is_coding', 'IsCoding').displayall()
-
-# <codecell>
-
-tbl_comparison_7g8_Pf3D7_01_v3.valuecounts('Truth_is_coding', 'GATK_is_coding', 'vrpipe_is_coding', 'IsCoding').displayall()
-
-# <codecell>
-
-tbl_comparison_7g8_Pf3D7_01_v3.valuecounts('vrpipe_SNPEFF_EFFECT', 'gatk_SNPEFF_EFFECT').displayall()
-
-# <codecell>
-
-tbl_comparison_7g8_Pf3D7_01_v3.valuecounts('IsInVRPIPE')
-
-# <headingcell level=1>
-
-# GATK vs VR-PIPE comparisons
-
-# <codecell>
-
-(tbl_comparison_7g8_Pf3D7_01_v3
-    .selecteq('IsCoding', 'True')
-    .selecteq('RegionType', 'Core')
-    .selecteq('IsAccessible', True)
-    .valuecounts('IsInVRPIPE', 'IsInGATK', 'IsInTruth')
-    .displayall()
-)
-
-# <codecell>
-
-(tbl_comparison_7g8_Pf3D7_01_v3
-    .selecteq('IsCoding', 'True')
-    .selecteq('RegionType', 'Core')
-    .selecteq('IsAccessible', True)
-    .valuecounts('IsInVRPIPE', 'IsInGATK', 'IsInTruth')
-    .displayall()
-)
-
-# <codecell>
-
-(tbl_comparison_7g8_Pf3D7_01_v3
-    .selecteq('IsCoding', 'True')
-    .selecteq('RegionType', 'Core')
-    .selecteq('IsAccessible', True)
-    .selecteq('IsInVRPIPE', False)
-    .selecteq('IsInGATK', True)
-    .selecteq('IsInTruth', True)
-    .displayall()
-)
-
-# <codecell>
-
 
 # <codecell>
 
@@ -445,12 +305,6 @@ def plotROC(isolate_code='7G8', RegionType='Core', IsCoding=True, mode='SNP',
     if ax is None:
         fig, ax = plt.subplots()
 
-#     # set up figure
-#     fig = figure(figsize=(8, 8))
-
-#     # set up roc plot
-#     ax = fig.add_subplot(1, 1, 1)
-    
     if(sort_by is None):
         array_to_plot = (tbl_whole_genome_comparisons[isolate_code]
             .selecteq('IsInGATK', True)
@@ -523,7 +377,7 @@ def plotROC(isolate_code='7G8', RegionType='Core', IsCoding=True, mode='SNP',
 
 # <codecell>
 
-rewrite=True
+rewrite=False
 
 isolate_codes = list(tbl_samples_to_process.values('Isolate code'))
 # isolate_codes = ['7G8']
@@ -571,7 +425,7 @@ for isolate_code in isolate_codes:
 
 # <codecell>
 
-tbl_comparisons['7G8']['Pf3D7_02_v3']
+tbl_whole_genome_comparisons['7G8'].selecteq('RegionType', 'Core').valuecounts('IsInGATK', 'IsInVRPIPE')
 
 # <codecell>
 
@@ -579,157 +433,121 @@ tbl_whole_genome_comparisons['7G8']
 
 # <codecell>
 
-tbl_whole_genome_comparisons['KE01']
+# Analysis for Zam
+for isolate_code in isolate_codes:
+    print(isolate_code)
+    (tbl_whole_genome_comparisons[isolate_code]
+    .selecteq('IsInVRPIPE', True)
+    .selecteq('IsInTruth', True)
+#     .selectgt('vrpipe_VQSLOD', 2)
+    .valuecounts('IsInTruth', 'IsCoding', 'mode')
+    .displayall()
+    )
+    (tbl_whole_genome_comparisons[isolate_code]
+    .selecteq('IsInVRPIPE', True)
+    .selecteq('IsInTruth', False)
+#     .selectgt('vrpipe_VQSLOD', 2)
+    .valuecounts('IsInTruth', 'IsCoding', 'mode')
+    .displayall()
+    )
+    (tbl_whole_genome_comparisons[isolate_code]
+    .selecteq('IsInVRPIPE', True)
+    .selecteq('IsInTruth', True)
+    .selecteq('RegionType', 'Core')
+#     .selectgt('vrpipe_VQSLOD', 2)
+    .valuecounts('IsInTruth', 'IsCoding', 'mode')
+    .displayall()
+    )
 
 # <headingcell level=1>
 
-# Differences between vr-pipe and manual
+# Ti/Tv of clustered variants
 
 # <codecell>
 
-tbl_whole_genome_comparisons['7G8'].selecteq('RegionType', 'Core').valuecounts('IsInGATK', 'IsInVRPIPE')
+def is_transition(rec):
+    return (((rec[0] == 'A') and (rec[1] == 'G')) 
+             or ((rec[0] == 'G') and (rec[1] == 'A')) 
+             or ((rec[0] == 'C') and (rec[1] == 'T')) 
+             or ((rec[0] == 'T') and (rec[1] == 'C')))
+
+def is_transversion(rec):
+    return (((rec[0] == 'A') and ((rec[1] == 'T') or (rec[1] == 'C')))
+             or ((rec[0] == 'G') and ((rec[1] == 'T') or (rec[1] == 'C')))
+             or ((rec[0] == 'C') and ((rec[1] == 'A') or (rec[1] == 'G')))
+             or ((rec[0] == 'T') and ((rec[1] == 'A') or (rec[1] == 'G'))))
+
+def calc_titv(rec_list, variant_type='TP'):
+    if variant_type=='TP':
+        new_list = [x for x in rec_list if x[2] and x[3]]
+    elif variant_type=='FP':
+        new_list = [x for x in rec_list if x[2] and not x[3] and x[4]]
+    if variant_type=='FN':
+        new_list = [x for x in rec_list if not x[2] and x[3]]
+    ti = np.count_nonzero([is_transition(rec) for rec in new_list])
+    tv = np.count_nonzero([is_transversion(rec) for rec in new_list])
+    if tv == 0:
+        titv = 0.0
+    else:
+        titv = 1.0*ti/tv
+#     print(ti, tv, titv)
+    return(titv)
+
+def calc_titv(rec_list):
+    ti = np.count_nonzero([is_transition(rec) for rec in rec_list])
+    tv = np.count_nonzero([is_transversion(rec) for rec in rec_list])
+    if tv == 0:
+        titv = 0.0
+    else:
+        titv = 1.0*ti/tv
+#     print(ti, tv, titv)
+    return(titv)
+
+def calc_ti(rec_list):
+    return np.count_nonzero([is_transition(rec) for rec in rec_list])
+def calc_tv(rec_list):
+    return np.count_nonzero([is_transversion(rec) for rec in rec_list])
 
 # <codecell>
 
-tbl_whole_genome_comparisons['GB4'].selecteq('RegionType', 'Core').valuecounts('IsInGATK', 'IsInVRPIPE')
+def calc_variant_summary_table(isolate_code='7G8', min_Truth_distance_nearest=0, min_VQSLOD=-99999):
+    aggregation = collections.OrderedDict()
+    aggregation['#Truth'] = 'IsInTruth', sum
+    aggregation['#GATK'] = 'IsInGATK', sum
+    aggregation['#GATK accessible'] = ('IsInGATK', 'IsAccessible'), lambda rec: np.sum([x[0] and x[1] for x in list(rec)])
+    aggregation['#TP'] = ('IsInGATK', 'IsInTruth'), lambda rec: np.sum([x[0] and x[1] for x in list(rec)])
+    aggregation['#FP'] = ('IsInGATK', 'IsInTruth', 'IsAccessible'), lambda rec: np.sum([x[0] and not x[1] and x[2] for x in list(rec)])
+    aggregation['#FN'] = ('IsInGATK', 'IsInTruth'), lambda rec: np.sum([not x[0] and x[1] for x in list(rec)])
+    aggregation['TiTv'] = ('REF', 'ALT'), lambda rec: calc_titv(list(rec))
+    aggregation['Ti'] = ('REF', 'ALT'), lambda rec: calc_ti(list(rec))
+    aggregation['Tv'] = ('REF', 'ALT'), lambda rec: calc_tv(list(rec))
+#     aggregation['TiTv FP'] = ('REF', 'ALT', 'IsInGATK', 'IsInTruth', 'IsAccessible'), lambda rec: calc_titv(list(rec), 'FP')
+#     aggregation['TiTv FN'] = ('REF', 'ALT', 'IsInGATK', 'IsInTruth', 'IsAccessible'), lambda rec: calc_titv(list(rec), 'FN')
+    aggregation['#mod3'] = ('REF', 'ALT'), lambda rec: np.sum([(len(x[0]) > 1 or len(x[1]) > 1 ) and (len(x[0]) - len(x[1])) % 3 == 0 for x in list(rec)])
+#     aggregation['#FPmod3'] = ('REF', 'ALT', 'IsInGATK', 'IsInTruth', 'IsAccessible'), lambda rec: np.sum([(len(x[0]) - len(x[1])) % 3 == 0 and x[2] and not x[3] and x[4] for x in list(rec)])
+#     aggregation['#FNmod3'] = ('REF', 'ALT', 'IsInGATK', 'IsInTruth'), lambda rec: np.sum([(len(x[0]) - len(x[1])) % 3 == 0 and not x[2] and x[3] for x in list(rec)])
+
+    tbl_variant_summary = (tbl_whole_genome_comparisons[isolate_code]
+        .selecteq('Truth_RegionType', 'Core')
+#         .selecteq('Truth_mode', 'SNP')
+        .addfield('Truth_distance_100', lambda rec: 20 if rec['Truth_distance_nearest'] > 200 else int(rec['Truth_distance_nearest']/10))
+        .addfield('VQSLOD_int', lambda rec: None if rec['vrpipe_VQSLOD'] is None else int(rec['vrpipe_VQSLOD']))
+#         .aggregate(('Truth_distance_100'), aggregation)
+        .aggregate(('VQSLOD_int'), aggregation) 
+#         .aggregate(('RegionType', 'IsCoding', 'mode'), aggregation)
+#         .convertnumbers()
+#         .addfield('Unfilt sensitivity', lambda rec: 0.0 if rec['#Truth'] == 0 else round(rec['#TP'] / rec['#Truth'], 3))
+#         .addfield('Unfilt FDR', lambda rec: 0.0 if rec['#GATK accessible'] == 0 else round(rec['#FP'] / rec['#GATK accessible'], 3))
+        .addfield('%TPmod3', lambda rec: 0.0 if rec['#Truth'] == 0 else round(rec['#mod3'] / rec['#Truth'], 3))
+#         .addfield('%FPmod3', lambda rec: 0.0 if rec['#FP'] == 0 else round(rec['#FPmod3'] / rec['#FP'], 3))
+#         .addfield('%FNmod3', lambda rec: 0.0 if rec['#FN'] == 0 else round(rec['#FNmod3'] / rec['#FN'], 3))
+    )
+    
+    return(tbl_variant_summary)
 
 # <codecell>
 
-tbl_whole_genome_comparisons['KE01'].selecteq('RegionType', 'Core').valuecounts('IsInGATK', 'IsInVRPIPE')
-
-# <codecell>
-
-tbl_whole_genome_comparisons['KH02'].selecteq('RegionType', 'Core').valuecounts('IsInGATK', 'IsInVRPIPE')
-
-# <codecell>
-
-tbl_whole_genome_comparisons['GN01'].selecteq('RegionType', 'Core').valuecounts('IsInGATK', 'IsInVRPIPE')
-
-# <codecell>
-
-(tbl_whole_genome_comparisons['KE01']
-#         .selecteq('mode', 'SNP')
-        .selecteq('RegionType', 'Core')
-#         .selecteq('IsCoding', 'True')
-        .selecteq('IsInGATK', True)
-        .selecteq('IsInVRPIPE', False)
-        .sort('POS')
-        .sort('CHROM')
-        .displayall()
-)
-
-# <codecell>
-
-(tbl_whole_genome_comparisons['KE01']
-#         .selecteq('mode', 'SNP')
-        .selecteq('RegionType', 'Core')
-#         .selecteq('IsCoding', 'True')
-        .selecteq('IsInGATK', False)
-        .selecteq('IsInVRPIPE', True)
-        .sort('POS')
-        .sort('CHROM')
-        .displayall()
-)
-
-# <codecell>
-
-etl.frompickle(os.path.join(CACHE_DIR, 'tbl_gatk', "tbl_gatk_%s.%s" % ('KE01', 'Pf3D7_01_v3'))).selecteq('POS', 136681)
-
-# <codecell>
-
-etl.frompickle(os.path.join(CACHE_DIR, 'tbl_vrpipe', "tbl_vrpipe_%s.%s" % ('KE01', 'Pf3D7_01_v3'))).selecteq('POS', 136681)
-
-# <codecell>
-
-etl.frompickle(os.path.join(CACHE_DIR, 'tbl_gatk', "tbl_gatk_%s.%s" % ('KE01', 'Pf3D7_01_v3'))).selecteq('POS', 192633)
-
-# <codecell>
-
-etl.frompickle(os.path.join(CACHE_DIR, 'tbl_vrpipe', "tbl_vrpipe_%s.%s" % ('KE01', 'Pf3D7_01_v3'))).selectgt('POS', 192550)
-
-# <codecell>
-
-(etl.fromvcf('/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/3/a/5/8/14782/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_01_v3.combined.vcf.gz')
-            .sort(['CHROM', 'POS'])
-            .vcfmeltsamples()
-            .vcfunpackcall()
-            .unpackdict('INFO', samplesize=1000000)
-            .selecteq('SAMPLE', 'ERS740937')
-            .selectnotnone('GT')
-            .selectne('GT', '0/0')
-            .rename('ALT', 'vrpipe_ALTs')
-            .addfield('ALT', lambda rec: str(rec[4][int(rec[11][2])-1]))
-            .selecteq('POS', 192633)
-            )
-
-# <codecell>
-
-(etl.fromvcf('/lustre/scratch110/malaria/dj6/pf3k/output/combine_variants2/3/a/5/8/14782/1_gatk_combine_variants_gatk3/SNP_INDEL_Pf3D7_01_v3.combined.vcf.gz')
-            .sort(['CHROM', 'POS'])
-            .vcfmeltsamples()
-            .vcfunpackcall()
-            .unpackdict('INFO', samplesize=1000000)
-            .selecteq('SAMPLE', 'ERS740937')
-            .selectnotnone('GT')
-            .selectne('GT', '0/0')
-            .rename('ALT', 'vrpipe_ALTs')
-            .addfield('ALT', lambda rec: str(rec[4][int(rec[11][2])-1]))
-            .selecteq('POS', 192633)
-            )
-
-# <codecell>
-
-(etl.fromvcf('/lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2/vcfs/vcf/filtered.annotated.SNP_INDEL.Pf3D7_01_v3.vcf.gz')
-            .sort(['CHROM', 'POS'])
-            .vcfmeltsamples()
-            .vcfunpackcall()
-            .unpackdict('INFO', samplesize=1000000)
-            .selecteq('SAMPLE', 'ERS740937')
-            .selectnotnone('GT')
-            .selectne('GT', '0/0')
-            .rename('ALT', 'gatk_ALTs')
-            .addfield('ALT', lambda rec: str(rec[4][int(rec[11][2])-1]))
-            .selecteq('POS', 192633)
-            )
-
-# <codecell>
-
-# Actual file used
-!grep 136681 /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/vcf/raw.snps.indels.Pf3D7_01_v3.vcf
-!grep 136681 /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/vcf/unfiltered.SNP.Pf3D7_01_v3.vcf
-!grep 136681 /nfs/team112_internal/production_files/Pf3k/methods/assembled_samples/vcfs/vcf/unfiltered.INDEL.Pf3D7_01_v3.vcf
-# Dushi file
-! grep 136681 
-
-# <codecell>
-
-(tbl_whole_genome_comparisons['KE01']
-        .selecteq('mode', 'SNP')
-        .selecteq('RegionType', 'Core')
-        .selecteq('IsCoding', 'True')
-        .selecteq('IsInGATK', False)
-        .selecteq('IsInVRPIPE', True)
-        .sort('POS')
-        .sort('CHROM')
-)
-
-# <codecell>
-
-
-# <codecell>
-
-
-# <codecell>
-
-(tbl_whole_genome_comparisons['KE01']
-        .selecteq('mode', 'SNP')
-        .selecteq('RegionType', 'Core')
-        .selecteq('IsCoding', 'True')
-        .selecteq('IsInGATK', False)
-        .selecteq('IsInVRPIPE', True)
-        .sort('POS')
-        .sort('CHROM')
-)
+calc_variant_summary_table().displayall()
 
 # <codecell>
 

@@ -8,7 +8,7 @@
 
 # To run (ideally using screen):
 # cd $HOME/src/github/malariagen/methods-dev/pf3k_techbm/scripts/gatk_pipeline
-# $HOME/src/github/malariagen/methods-dev/pf3k_techbm/scripts/gatk_pipeline/gatk_pipeline_20150910.sh >> $HOME/src/github/malariagen/methods-dev/pf3k_techbm/log/gatk_pipeline_20150910.log
+# $HOME/src/github/malariagen/methods-dev/pf3k_techbm/scripts/gatk_pipeline/gatk_pipeline_20150911.sh >> $HOME/src/github/malariagen/methods-dev/pf3k_techbm/log/gatk_pipeline_20150911.log
 
 
 ################################################################################
@@ -66,7 +66,7 @@ export SNPEFF_CONFIG_FN="${SNPEFF_DIR}/snpEff.config"
 # data files
 export REF_GENOME="${REF_GENOME_DIR}/Pfalciparum.genome.fasta"
 export REF_GENOME_INDEX="${REF_GENOME_DIR}/Pfalciparum.genome.fasta.fai"
-export REF_GENOME_DICTIONARY="${REF_GENOME_DIR}/Pfalciparum.genome.fasta.dict"
+export REF_GENOME_DICTIONARY="${REF_GENOME_DIR}/Pfalciparum.genome.dict"
 # export REF_GENOME="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa"
 # export REF_GENOME_INDEX="/nfs/team112_internal/production_files/Pf3k/methods/GATKbuild/roamato/Pf3D7_v3/3D7_sorted.fa.fai"
 export REGIONS_FN="$HOME/src/github/malariagen/pf-crosses/meta/regions-20130225.bed.gz"
