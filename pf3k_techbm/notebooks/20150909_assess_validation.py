@@ -366,6 +366,10 @@ tbl_comparison_7g8_Pf3D7_01_v3 = assess_validation(rewrite=True)
 
 # <codecell>
 
+tbl_comparison_7g8_Pf3D7_01_v3.selecteq('IsCoding', 'False__True')
+
+# <codecell>
+
 tbl_comparison_7g8_Pf3D7_01_v3.valuecounts('IsInGATK', 'IsInVRPIPE').displayall()
 
 # <codecell>
