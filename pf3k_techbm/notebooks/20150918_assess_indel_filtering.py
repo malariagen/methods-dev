@@ -8,19 +8,20 @@
 # <codecell>
 
 %run _shared_setup.ipynb
-CACHE_DIR = os.path.join(CACHE_DIR, '20150915_assess_validation')
-PROCESSED_ASSEMBLED_SAMPLES_DIR = '/lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/assembled_samples_2'
+CACHE_DIR = os.path.join(CACHE_DIR, '20150918_assess_indel_filtering')
+PROCESSED_ASSEMBLED_SAMPLES_DIR = '/lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/validation_results'
 
 # <codecell>
 
-!mkdir -p {os.path.join(CACHE_DIR, 'tbl_truth')}
-!mkdir -p {os.path.join(CACHE_DIR, 'tbl_gatk')}
-!mkdir -p {os.path.join(CACHE_DIR, 'tbl_comparison')}
+# !mkdir -p {os.path.join(CACHE_DIR, 'tbl_truth')}
+# !mkdir -p {os.path.join(CACHE_DIR, 'tbl_gatk')}
+# !mkdir -p {os.path.join(CACHE_DIR, 'tbl_comparison')}
 
 # <codecell>
 
-PLOTS_DIR = '/Users/rpearson/Documents/projects/Pf3k_techbm/slides/20150915_assess_release4/plots'
-!mkdir -p {PLOTS_DIR}
+PIPELINES_FN='%s/src/github/malariagen/methods-dev/pf3k_techbm/scripts/gatk_pipeline/pipeline_parameters_20150918.xlsx' % os.environ['HOME']
+# PLOTS_DIR = '/Users/rpearson/Documents/projects/Pf3k_techbm/slides/20150918_assess_indel_filtering/plots'
+# !mkdir -p {PLOTS_DIR}
 
 # <codecell>
 
@@ -31,6 +32,21 @@ NONCODING_EFFECTS = ['INTERGENIC', 'INTRON', 'TRANSCRIPT']
 # <codecell>
 
 ref_dict=SeqIO.to_dict(SeqIO.parse(open(REF_GENOME), "fasta"))
+
+# <headingcell level=1>
+
+# Copy data from malsrv2
+
+# <codecell>
+
+tbl_pipelines = etl.fromxlsx(PIPELINES_FN)
+tbl_pipelines
+
+# <codecell>
+
+
+# <codecell>
+
 
 # <headingcell level=1>
 
