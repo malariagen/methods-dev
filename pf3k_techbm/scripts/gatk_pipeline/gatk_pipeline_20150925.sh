@@ -8,7 +8,7 @@
 
 # To run (ideally using screen):
 # cd $HOME/src/github/malariagen/methods-dev/pf3k_techbm/scripts/gatk_pipeline
-# $HOME/src/github/malariagen/methods-dev/pf3k_techbm/scripts/gatk_pipeline/gatk_pipeline_20150918.sh >> $HOME/src/github/malariagen/methods-dev/pf3k_techbm/log/gatk_pipeline_20150918.log
+# $HOME/src/github/malariagen/methods-dev/pf3k_techbm/scripts/gatk_pipeline/gatk_pipeline_20150925.sh >> $HOME/src/github/malariagen/methods-dev/pf3k_techbm/log/gatk_pipeline_20150925.log
 
 
 ################################################################################
@@ -29,17 +29,22 @@
 # set -e
 # set -o pipefail
 
-echo ${VQSR_ANNOTATIONS_SNP}
-echo ${VQSR_ANNOTATIONS_INDEL}
 
-[ -z "$PIPELINE_NAME" ] && PIPELINE_NAME="default"
+[ -z "$PIPELINE_NAME" ] && PIPELINE_NAME="alistair_ann"
 [ -z "$MAPPING_DIR" ] && MAPPING_DIR="bwa_mem"
 [ -z "$BAMS_DIR" ] && BAMS_DIR="gatk_rec"
 [ -z "$UNFILTERED_DIR" ] && UNFILTERED_DIR="HaplotypeCaller"
-[ -z "$FILTERED_DIR" ] && FILTERED_DIR="crosses_truth"
+[ -z "$FILTERED_DIR" ] && FILTERED_DIR="alistair_ann"
 [ -z "$ANNOTATED_DIR" ] && ANNOTATED_DIR="SnpEff_region"
+[ -z "$VQSR_ANNOTATIONS_SNP" ] && VQSR_ANNOTATIONS_SNP="-an QD -an MQ -an MQRankSum -an ReadPosRankSum -an FS -an SOR -an DP"
+[ -z "$VQSR_ANNOTATIONS_INDEL" ] && VQSR_ANNOTATIONS_INDEL="-an QD -an DP -an MQ -an FS -an BaseQRankSum"
+[ -z "$MAX_GAUSSIANS_SNP" ] && MAX_GAUSSIANS_SNP="8"
+[ -z "$MAX_GAUSSIANS_INDEL" ] && MAX_GAUSSIANS_INDEL="4"
+[ -z "$VQSR_TRAINING" ] && VQSR_PRIOR="crosses"
 [ -z "$VQSR_PRIOR" ] && VQSR_PRIOR="15"
 
+echo ${VQSR_ANNOTATIONS_SNP}
+echo ${VQSR_ANNOTATIONS_INDEL}
 
 # directories
 export ORIGINAL_DIR=`pwd`
@@ -298,7 +303,7 @@ directories=( \
 "${PROCESSED_DATA_DIR}/${MAPPING_DIR}/${BAMS_DIR}/${UNFILTERED_DIR}/${FILTERED_DIR}/_intermediate_files/recal" \
 "${PROCESSED_DATA_DIR}/${MAPPING_DIR}/${BAMS_DIR}/${UNFILTERED_DIR}/${FILTERED_DIR}/_filtered_vcfs" \
 "${PROCESSED_DATA_DIR}/${MAPPING_DIR}/${BAMS_DIR}/${UNFILTERED_DIR}/${FILTERED_DIR}/${ANNOTATED_DIR}/_intermediate_files" \
-"${PROCESSED_DATA_DIR}/${MAPPING_DIR}/${BAMS_DIR}/${UNFILTERED_DIR}/${FILTERED_DIR}/${ANNOTATED_DIR}/_annotated_vcfs" \
+"${PROCESSED_DATA_DIR}/${MAPPING_DIR}/${BAMS_DIR}/${UNFILTERED_DIR}/${FILTERED_DIR}/${ANNOTATED_DIR}/_final_vcfs" \
 "${TEMP_DIR}" \
 )
 # "${PROCESSED_DATA_DIR}/${MAPPING_DIR}/${BAMS_DIR}/${UNFILTERED_DIR}/${FILTERED_DIR}/_intermediate_files/unfiltered" \
@@ -758,7 +763,7 @@ do
     chromosome=`awk "NR==$chromosome_index" ${REF_GENOME_INDEX} | cut -f1`
     annotated_snp_vcf_fn="${PROCESSED_DATA_DIR}/${MAPPING_DIR}/${BAMS_DIR}/${UNFILTERED_DIR}/${FILTERED_DIR}/${ANNOTATED_DIR}/_intermediate_files/filtered.annotated.SNP.${chromosome}.vcf"
     annotated_indel_vcf_fn="${PROCESSED_DATA_DIR}/${MAPPING_DIR}/${BAMS_DIR}/${UNFILTERED_DIR}/${FILTERED_DIR}/${ANNOTATED_DIR}/_intermediate_files/filtered.annotated.INDEL.${chromosome}.vcf"
-    annotated_combined_vcf_fn="${PROCESSED_DATA_DIR}/${MAPPING_DIR}/${BAMS_DIR}/${UNFILTERED_DIR}/${FILTERED_DIR}/${ANNOTATED_DIR}/_annotated_vcfs/filtered.annotated.SNP_INDEL.${chromosome}.vcf"
+    annotated_combined_vcf_fn="${PROCESSED_DATA_DIR}/${MAPPING_DIR}/${BAMS_DIR}/${UNFILTERED_DIR}/${FILTERED_DIR}/${ANNOTATED_DIR}/_intermediate_files/filtered.annotated.SNP_INDEL.${chromosome}.vcf"
     if [ ! -s ${annotated_combined_vcf_fn}.gz ]; then
         ${GATK_EXE} \
             -T CombineVariants \
@@ -771,6 +776,30 @@ do
             2> /dev/null
         bgzip -f ${annotated_combined_vcf_fn}
         tabix -p vcf -f ${annotated_combined_vcf_fn}.gz
+    fi
+done
+
+
+# Apply final filters
+for (( chromosome_index=1; chromosome_index<=${number_of_chromosomes}; chromosome_index++ ));
+do
+    chromosome=`awk "NR==$chromosome_index" ${REF_GENOME_INDEX} | cut -f1`
+    annotated_combined_vcf_fn="${PROCESSED_DATA_DIR}/${MAPPING_DIR}/${BAMS_DIR}/${UNFILTERED_DIR}/${FILTERED_DIR}/${ANNOTATED_DIR}/_intermediate_files/filtered.annotated.SNP_INDEL.${chromosome}.vcf.gz"
+    final_vcf_fn="${PROCESSED_DATA_DIR}/${MAPPING_DIR}/${BAMS_DIR}/${UNFILTERED_DIR}/${FILTERED_DIR}/${ANNOTATED_DIR}/_final_vcfs/final.SNP_INDEL.${chromosome}.vcf"
+    if [ ! -s ${annotated_combined_vcf_fn}.gz ]; then
+        ${GATK_EXE} \
+            -T VariantFiltration \
+            -R ${REF_GENOME} \
+            --variant ${annotated_combined_vcf_fn} \
+            -o ${final_vcf_fn} \
+            --filterName "Low_VQSLOD" --filterExpression "VQSLOD <= 0.0" \
+            --filterName "Centromere" --filterExpression "RegionType == 'Centromere'" \
+            --filterName "InternalHypervariable" --filterExpression "RegionType == 'InternalHypervariable'" \
+            --filterName "SubtelomericHypervariable" --filterExpression "RegionType == 'SubtelomericHypervariable'" \
+            --filterName "SubtelomericRepeat" --filterExpression "RegionType == 'SubtelomericRepeat'" \
+            --invalidatePreviousFilters 2> /dev/null
+        bgzip -f ${final_vcf_fn}
+        tabix -p vcf -f ${final_vcf_fn}.gz
     fi
 done
 
