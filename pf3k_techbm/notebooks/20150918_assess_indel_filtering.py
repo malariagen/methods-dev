@@ -40,10 +40,15 @@ ref_dict=SeqIO.to_dict(SeqIO.parse(open(REF_GENOME), "fasta"))
 # <codecell>
 
 tbl_pipelines = etl.fromxlsx(PIPELINES_FN)
-tbl_pipelines
+tbl_pipelines.display(index_header=True)
 
 # <codecell>
 
+for rec in tbl_pipelines.data():
+    annotated_vcfs_dir = "%s/%s/%s/%s/%s/%s/" % (PROCESSED_ASSEMBLED_SAMPLES_DIR, rec[1], rec[2], rec[3], rec[4], rec[5])
+    print(annotated_vcfs_dir)
+    !mkdir -p {annotated_vcfs_dir}
+    !rsync -av malsrv2:{annotated_vcfs_dir}_annotated_vcfs {annotated_vcfs_dir}
 
 # <codecell>
 
@@ -60,7 +65,7 @@ tbl_samples_to_process = (tbl_assembled_samples
     .selecteq('To be used for', 'Validation')
     .addfield('truth_vcf_filestem', lambda rec: os.path.join(
         '/nfs/team112_internal/production_files/Pf3k/methods/assembled_samples',
-        'truth_vcfs',
+        'truth_vcfs_2',
         "truth_%s" % rec['Isolate code']
     ))
     .cutout('To be used for')
@@ -151,12 +156,27 @@ gatk_renames = dict(zip(fields_to_compare, ['gatk_%s' % field_name for field_nam
 
 # <codecell>
 
-def assess_validation(isolate_code='7G8', chromosome='Pf3D7_01_v3', rewrite=False):
+def assess_validation(isolate_code='7G8', chromosome='Pf3D7_01_v3', MAPPING_DIR='bwa_mem', BAMS_DIR='gatk_rec',
+                      UNFILTERED_DIR='HaplotypeCaller', FILTERED_DIR='alistair_ann', ANNOTATED_DIR='SnpEff_region',
+                      rewrite=False):
     ox_code = tbl_samples_to_process.selecteq('Isolate code', isolate_code).values('ox_code')[0]
     
-    tbl_truth_cache_fn = os.path.join(CACHE_DIR, 'tbl_truth', "tbl_truth_%s.%s" % (isolate_code, chromosome))
-    tbl_gatk_cache_fn = os.path.join(CACHE_DIR, 'tbl_gatk', "tbl_gatk_%s.%s" % (isolate_code, chromosome))
-    tbl_comparison_cache_fn = os.path.join(CACHE_DIR, 'tbl_comparison', "tbl_comparison_%s.%s" % (isolate_code, chromosome))
+    tbl_truth_cache_dir = os.path.join(CACHE_DIR, 'tbl_truth', MAPPING_DIR, BAMS_DIR, UNFILTERED_DIR, FILTERED_DIR, ANNOTATED_DIR)
+    tbl_gatk_cache_dir = os.path.join(CACHE_DIR, 'tbl_gatk', MAPPING_DIR, BAMS_DIR, UNFILTERED_DIR, FILTERED_DIR, ANNOTATED_DIR)
+    tbl_comparison_cache_dir = os.path.join(CACHE_DIR, 'tbl_comparison', MAPPING_DIR, BAMS_DIR, UNFILTERED_DIR, FILTERED_DIR, ANNOTATED_DIR)
+    if not os.path.exists(tbl_truth_cache_dir):
+        os.makedirs(tbl_truth_cache_dir)
+    if not os.path.exists(tbl_gatk_cache_dir):
+        os.makedirs(tbl_gatk_cache_dir)
+    if not os.path.exists(tbl_comparison_cache_dir):
+        os.makedirs(tbl_comparison_cache_dir)
+    tbl_truth_cache_fn = os.path.join(tbl_truth_cache_dir, "tbl_truth_%s.%s" % (isolate_code, chromosome))
+    tbl_gatk_cache_fn = os.path.join(tbl_gatk_cache_dir, "tbl_gatk_%s.%s" % (isolate_code, chromosome))
+    tbl_comparison_cache_fn = os.path.join(tbl_comparison_cache_dir, "tbl_comparison_%s.%s" % (isolate_code, chromosome))
+    
+#     print(tbl_truth_cache_fn)
+#     print(tbl_gatk_cache_fn)
+#     print(tbl_comparison_cache_fn)
     
     if not os.path.exists(tbl_truth_cache_fn) or rewrite:
         truth_vcf_fn = "%s.%s.annotated.vcf.gz" % (
@@ -170,7 +190,9 @@ def assess_validation(isolate_code='7G8', chromosome='Pf3D7_01_v3', rewrite=Fals
             .addfield('ALT', lambda rec: str(rec[4][0]))
             .addfield('Truth_is_coding', lambda rec: not rec['SNPEFF_EFFECT'] is None and not rec['SNPEFF_EFFECT'] in NONCODING_EFFECTS)
             .cut(['CHROM', 'POS', 'REF', 'ALT', 'truth_ALTs', 'RegionType', 'Truth_is_coding', 'SNPEFF_AMINO_ACID_CHANGE', 'SNPEFF_EFFECT',
-                  'SNPEFF_GENE_NAME', 'SNPEFF_IMPACT', 'SNPEFF_TRANSCRIPT_ID'])
+                  'SNPEFF_GENE_NAME', 'SNPEFF_IMPACT', 'SNPEFF_TRANSCRIPT_ID', 'RPA', 'RU', 'STR'])
+            .addfield('Truth_RPA_REF', lambda rec: None if rec['RPA'] is None else str(rec['RPA'][0]))
+            .addfield('Truth_RPA_ALT', lambda rec: None if rec['RPA'] is None else str(rec['RPA'][1]))
             .rename('RegionType', 'Truth_RegionType')
             .rename('SNPEFF_AMINO_ACID_CHANGE', 'Truth_AAChange')
             .rename('SNPEFF_EFFECT', 'Truth_Effect')
@@ -188,9 +210,11 @@ def assess_validation(isolate_code='7G8', chromosome='Pf3D7_01_v3', rewrite=Fals
         
     if not os.path.exists(tbl_gatk_cache_fn) or rewrite:
         gatk_vcf_fn = "%s.SNP_INDEL.%s.vcf.gz" % (
-            os.path.join(PROCESSED_ASSEMBLED_SAMPLES_DIR, 'vcfs', 'vcf', 'filtered.annotated'),
+            os.path.join(PROCESSED_ASSEMBLED_SAMPLES_DIR, MAPPING_DIR, BAMS_DIR, UNFILTERED_DIR, FILTERED_DIR, ANNOTATED_DIR,
+                         '_annotated_vcfs', 'filtered.annotated'),
             chromosome
         )
+        print(gatk_vcf_fn)
         
         tbl_gatk = (etl.fromvcf(gatk_vcf_fn)
             .sort(['CHROM', 'POS'])
@@ -201,8 +225,14 @@ def assess_validation(isolate_code='7G8', chromosome='Pf3D7_01_v3', rewrite=Fals
             .selectnotnone('GT')
             .selectne('GT', '0/0')
             .rename('ALT', 'gatk_ALTs')
-            .addfield('ALT', lambda rec: str(rec[4][int(rec[11][2])-1]))
+            .addfield('ALT', lambda rec: str(rec['gatk_ALTs'][int(rec['GT'][2])-1]))
+            .addfield('gatk_RPA_REF', lambda rec: None if rec['RPA'] is None else str(rec['RPA'][0]))
+            .addfield('gatk_RPA_ALT', lambda rec: None if rec['RPA'] is None else str(rec['RPA'][int(rec['GT'][2])]))
+            .rename('RPA', 'gatk_RPA')
+            .rename('STR', 'gatk_STR')
+            .rename('RU', 'gatk_RU')
             .addfield('GATK_is_coding', lambda rec: not rec['SNPEFF_EFFECT'] is None and not rec['SNPEFF_EFFECT'] in NONCODING_EFFECTS)
+            .addfield('is_het', lambda rec: None if rec['GT'] is None else rec['GT'][0] != rec['GT'][2])
             .rename(gatk_renames)
 #             .select('ALT', lambda rec: str(rec) != '<*:DEL>')
             .select('ALT', lambda rec: str(rec) != '*')
@@ -255,7 +285,499 @@ def assess_validation(isolate_code='7G8', chromosome='Pf3D7_01_v3', rewrite=Fals
 
 # <codecell>
 
-assess_validation()
+# assess_validation(FILTERED_DIR='crosses_truth')
+assess_validation(rewrite=True).selectnotnone('RPA')
+
+# <codecell>
+
+assess_validation(rewrite=False).addfield('num_filters', lambda rec: 0 if rec['gatk_FILTER'] is None else len(rec['gatk_FILTER'])).valuecounts('num_filters')
+
+# <codecell>
+
+assess_validation(rewrite=False).valuecounts('GQ').displayall()
+
+# <codecell>
+
+assess_validation(rewrite=False).selectnotnone('GQ').valuecounts('GQ').displayall()
+
+# <codecell>
+
+for var in ['CHROM', 'POS', 'IsInTruth', 'IsInGATK', 'RegionType', 'IsCoding', 'Effect', 'mode', 'IsAccessible',
+                    'Truth_distance_nearest', 'STR',
+                    'gatk_VQSLOD',
+                    'num_alts',
+                    'num_filters',
+                    'gatk_QUAL',
+# #                     #'gatk_AC', 'gatk_AF', 'gatk_AN',
+                    'gatk_BaseQRankSum', 'gatk_ClippingRankSum',
+                    'GC', 'gatk_MQ', 'gatk_MQRankSum', 'gatk_QD',
+                    'gatk_ReadPosRankSum', 'gatk_SOR', 'GQ',
+                    'NEGATIVE_TRAIN_SITE', 'POSITIVE_TRAIN_SITE', 'gatk_RPA_REF', 'gatk_RPA_ALT', 'gatk_RU',
+                    'gatk_SNPEFF_IMPACT', 'gatk_STR', 'gatk_culprit', 'gatk_set']:
+    print(var)
+    (assess_validation(rewrite=False)
+     .addfield('num_alts', lambda rec: 0 if rec['gatk_ALTs'] is None else len(rec['gatk_ALTs']))
+    .addfield('num_filters', lambda rec: 0 if rec['gatk_FILTER'] is None else len(rec['gatk_FILTER']))
+    .selecteq(var, 'NaN')
+    .display()
+    )
+
+# <codecell>
+
+pipelines_complete = ['cortex_training', 'default', 'alistair_ann', 'no_QD_indel', 'no_DP_indel', 'no_FS_indel', 'no_SOR_indel',
+                      'no_ReadPosRankSum_indel', 'no_MQRankSum_indel', 'max_gauss_indel_5', 'max_gauss_indel_6',
+                      'max_gauss_indel_8', 'vqsr_prior_5', 'hrun']
+
+# pipelines_complete = ['default', 'alistair_ann']
+
+# <codecell>
+
+rewrite=False
+
+for rec in tbl_pipelines.data():
+    if True:
+#     if rec[0] in pipelines_complete:
+        annotated_vcfs_dir = "%s/%s/%s/%s/%s/%s/" % (PROCESSED_ASSEMBLED_SAMPLES_DIR, rec[1], rec[2], rec[3], rec[4], rec[5])
+
+        isolate_codes = list(tbl_samples_to_process.values('Isolate code'))
+        # isolate_codes = ['7G8']
+        chromosomes = ['Pf3D7_%02d_v3' % chrom for chrom in range(1,15)]
+
+        tbl_comparisons = collections.OrderedDict()
+        tbl_whole_genome_comparisons = collections.OrderedDict()
+
+    #     tbl_comparison_all_cache_dir = os.path.join(CACHE_DIR, 'tbl_comparison', rec[1], rec[2], rec[3], rec[4], rec[5])
+    #     tbl_comparison_all_cache_fn = os.path.join(tbl_comparison_all_cache_dir, "tbl_comparison_all")
+
+        # if not os.path.exists(tbl_comparison_all_cache_fn) or rewrite:
+        for isolate_code in isolate_codes:
+#             print(rec[0], isolate_code)
+            tbl_comparisons[isolate_code] = collections.OrderedDict()
+            for chromosome in chromosomes:
+                print(rec[0], isolate_code, chromosome)
+                tbl_comparisons[isolate_code][chromosome] = assess_validation(isolate_code, chromosome, MAPPING_DIR=rec[1],
+                                                                              BAMS_DIR=rec[2], UNFILTERED_DIR=rec[3],
+                                                                              FILTERED_DIR=rec[4], ANNOTATED_DIR=rec[5],
+                                                                              rewrite=rewrite)
+
+            tbl_comparison_cache_dir = os.path.join(CACHE_DIR, 'tbl_comparison', rec[1], rec[2], rec[3], rec[4], rec[5])
+            tbl_comparison_sample_cache_fn = os.path.join(tbl_comparison_cache_dir, "tbl_comparison_%s" % (isolate_code))
+            if not os.path.exists(tbl_comparison_sample_cache_fn) or rewrite:
+                tbl_whole_genome_comparisons[isolate_code] = (
+                    tbl_comparisons[isolate_code]['Pf3D7_01_v3']
+                    .cat(tbl_comparisons[isolate_code]['Pf3D7_02_v3'])
+                    .cat(tbl_comparisons[isolate_code]['Pf3D7_03_v3'])
+                    .cat(tbl_comparisons[isolate_code]['Pf3D7_04_v3'])
+                    .cat(tbl_comparisons[isolate_code]['Pf3D7_05_v3'])
+                    .cat(tbl_comparisons[isolate_code]['Pf3D7_06_v3'])
+                    .cat(tbl_comparisons[isolate_code]['Pf3D7_07_v3'])
+                    .cat(tbl_comparisons[isolate_code]['Pf3D7_08_v3'])
+                    .cat(tbl_comparisons[isolate_code]['Pf3D7_09_v3'])
+                    .cat(tbl_comparisons[isolate_code]['Pf3D7_10_v3'])
+                    .cat(tbl_comparisons[isolate_code]['Pf3D7_11_v3'])
+                    .cat(tbl_comparisons[isolate_code]['Pf3D7_12_v3'])
+                    .cat(tbl_comparisons[isolate_code]['Pf3D7_13_v3'])
+                    .cat(tbl_comparisons[isolate_code]['Pf3D7_14_v3'])
+                    .sort('gatk_VQSLOD', reverse=True)
+                )
+                etl.topickle(tbl_whole_genome_comparisons[isolate_code], tbl_comparison_sample_cache_fn)
+            else:
+                tbl_whole_genome_comparisons[isolate_code] = etl.frompickle(tbl_comparison_sample_cache_fn)
+                
+        tbl_comparison_sample_cache_fn = os.path.join(tbl_comparison_cache_dir, "tbl_comparison_All")
+        if not os.path.exists(tbl_comparison_sample_cache_fn) or rewrite:
+            tbl_whole_genome_comparisons['All'] = (
+                tbl_whole_genome_comparisons['7G8'].addfield('Sample', '7G8')
+                .cat(tbl_whole_genome_comparisons['GB4'].addfield('Sample', 'GB4'))
+                .cat(tbl_whole_genome_comparisons['KE01'].addfield('Sample', 'KE01'))
+                .cat(tbl_whole_genome_comparisons['KH02'].addfield('Sample', 'KH02'))
+                .cat(tbl_whole_genome_comparisons['GN01'].addfield('Sample', 'GN01'))
+                .sort('gatk_VQSLOD', reverse=True)
+            )
+            etl.topickle(tbl_whole_genome_comparisons['All'], tbl_comparison_sample_cache_fn)
+        else:
+            tbl_whole_genome_comparisons['All'] = etl.frompickle(tbl_comparison_sample_cache_fn)
+
+
+        #     etl.topickle(tbl_whole_genome_comparisons, tbl_comparison_all_cache_fn)
+        # else:
+        #     tbl_whole_genome_comparisons = etl.frompickle(tbl_comparison_all_cache_fn)
+
+
+# <codecell>
+
+rewrite=True
+
+comparison_arrays = collections.OrderedDict()
+for rec in tbl_pipelines.sort('PIPELINE_NAME').data():
+#     print(rec[0])
+    if not rec[0] in ['hrun']:
+#     if rec[0] in pipelines_complete:
+#     if True:
+        print(rec[0])
+        tbl_comparison_cache_dir = os.path.join(CACHE_DIR, 'tbl_comparison', rec[1], rec[2], rec[3], rec[4], rec[5])
+        tbl_comparison_sample_cache_fn = os.path.join(tbl_comparison_cache_dir, "tbl_comparison_All")
+        comparison_array_cache_fn = os.path.join(tbl_comparison_cache_dir, "comparison_array.npy")
+        if not os.path.exists(comparison_array_cache_fn) or rewrite:
+            tbl_all_whole_genome_comparisons = etl.frompickle(tbl_comparison_sample_cache_fn)
+            comparison_array = etl.toarray(
+                tbl_all_whole_genome_comparisons
+                .addfield('num_alts', lambda rec: 0 if rec['gatk_ALTs'] is None else len(rec['gatk_ALTs']))
+                .addfield('num_filters', lambda rec: 0 if rec['gatk_FILTER'] is None else len(rec['gatk_FILTER']))
+                .replace('Truth_distance_nearest', None, 0)
+                .replace('STR', None, False)
+                .replace('gatk_VQSLOD', None, np.nan)
+#                 .replace('gatk_ALTs', None, np.nan)
+#                 .replace('gatk_FILTER', None, '')
+                .replace('gatk_QUAL', None, np.nan)
+#                 .replace('gatk_AC', None, np.nan)
+#                 .replace('gatk_AF', None, np.nan)
+#                 .replace('gatk_AN', None, np.nan)
+                .replace('gatk_BaseQRankSum', None, np.nan)
+                .replace('gatk_ClippingRankSum', None, np.nan)
+                .replace('GC', None, np.nan)
+                .replace('gatk_DP', None, np.nan)
+                .replace('gatk_FS', None, np.nan)
+                .replace('gatk_MQ', None, np.nan)
+                .replace('gatk_MQRankSum', None, np.nan)
+                .replace('gatk_QD', None, np.nan)
+                .replace('gatk_ReadPosRankSum', None, np.nan)
+                .replace('gatk_SOR', None, np.nan)
+                .replace('GQ', None, 0)
+#                 .replace('is_het', None, False)
+#                 .replace('NEGATIVE_TRAIN_SITE', None, False)
+#                 .replace('POSITIVE_TRAIN_SITE', None, False)
+#                 .replace('gatk_RPA_REF', None, )
+                .convert('gatk_RPA_REF', lambda rec: np.nan if rec is None else int(rec))
+                .convert('gatk_RPA_ALT', lambda rec: np.nan if rec is None else int(rec))
+#                 .replace('gatk_RPA_ALT', None, '')
+                .replace('gatk_RU', None, '')
+                .replace('gatk_SNPEFF_IMPACT', None, '')
+                .replace('gatk_STR', None, False)
+                .replace('gatk_culprit', None, '')
+                .replace('gatk_set', None, '')
+                .cut(['CHROM', 'POS', 'IsInTruth', 'IsInGATK', 'RegionType', 'IsCoding', 'Effect', 'mode', 'IsAccessible',
+                    'Truth_distance_nearest', 'STR',
+                    'gatk_VQSLOD',
+                    'num_alts',
+                    'num_filters',
+                    'gatk_QUAL',
+# #                     #'gatk_AC', 'gatk_AF', 'gatk_AN',
+                    'gatk_BaseQRankSum', 'gatk_ClippingRankSum',
+                    'GQ', 'GC', 'gatk_MQ', 'gatk_MQRankSum', 'gatk_QD',
+                    'gatk_ReadPosRankSum', 'gatk_SOR',
+# 'GQ',
+#                     'NEGATIVE_TRAIN_SITE', 'POSITIVE_TRAIN_SITE',
+                    'gatk_RPA_REF',
+                    'gatk_RPA_ALT', 'gatk_RU',
+                    'gatk_SNPEFF_IMPACT', 'gatk_STR', 'gatk_culprit', 'gatk_set'
+                ])
+            )
+            np.save(comparison_array_cache_fn, comparison_array)
+        else:
+            comparison_array = np.load(comparison_array_cache_fn)
+        comparison_arrays[rec[0]] = comparison_array
+
+# <codecell>
+
+rec = tbl_pipelines.data()[1]
+tbl_comparison_cache_dir = os.path.join(CACHE_DIR, 'tbl_comparison', rec[1], rec[2], rec[3], rec[4], rec[5])
+tbl_comparison_sample_cache_fn = os.path.join(tbl_comparison_cache_dir, "tbl_comparison_All")
+comparison_array_cache_fn = os.path.join(tbl_comparison_cache_dir, "comparison_array.npy")
+tbl_all_whole_genome_comparisons = etl.frompickle(tbl_comparison_sample_cache_fn)
+
+# <codecell>
+
+tbl_all_whole_genome_comparisons.valuecounts('gatk_RPA_REF').displayall()
+
+# <codecell>
+
+for var in [
+# 'CHROM', 'POS', 'IsInTruth', 'IsInGATK', 'RegionType', 'IsCoding', 'Effect', 'mode', 'IsAccessible',
+#                     'Truth_distance_nearest', 'STR',
+#                     'gatk_VQSLOD',
+#                     'num_alts',
+#                     'num_filters',
+#                     'gatk_QUAL',
+# # #                     #'gatk_AC', 'gatk_AF', 'gatk_AN',
+#                     'gatk_BaseQRankSum', 'gatk_ClippingRankSum',
+#                     'GC', 'gatk_MQ', 'gatk_MQRankSum', 'gatk_QD',
+                    'gatk_ReadPosRankSum', 'gatk_SOR', 'GQ',
+                    'NEGATIVE_TRAIN_SITE', 'POSITIVE_TRAIN_SITE', 'gatk_RPA_REF', 'gatk_RPA_ALT', 'gatk_RU',
+                    'gatk_SNPEFF_IMPACT', 'gatk_STR', 'gatk_culprit', 'gatk_set']:
+    print(var)
+    temp = etl.toarray(tbl_all_whole_genome_comparisons
+    .replace(var, None, '0')
+    .cut([var])
+    )
+
+# <codecell>
+
+pipelines_complete
+
+# <codecell>
+
+shape(comparison_arrays['alistair_ann'])
+
+# <codecell>
+
+# assess_validation().header()
+
+# <codecell>
+
+annotations = (
+    ('gatk_VQSLOD', np.linspace(-2, 6, 100)),
+#     ('gatk_QD', np.arange(0, 41, 1)),
+#     ('GQ', np.linspace(0, 20000, 100)),
+# #     ('gatk_QUAL', np.arange(0, 10000, 200)),
+    ('gatk_QUAL', np.linspace(0, 20000, 100)),
+#     ('gatk_AC', np.arange(0, 61, 1)),
+#     ('gatk_AN', np.arange(0, 61, 1)),
+#     ('gatk_MQ', np.arange(0, 61, 1)),
+#     ('gatk_DP', np.linspace(0, 20000, 50)),
+#     ('gatk_FS', np.arange(0, 20, .5)),
+#     ('gatk_BaseQRankSum', np.arange(-20, 20, 1)),
+    ('Truth_distance_nearest', np.linspace(0, 10000, 100))
+#     ('ABHom', np.arange(0, 1.05, .05))
+)
+
+# <codecell>
+
+np.linspace(0, 100, 20)
+
+# <codecell>
+
+# inheritance_states = range(1, 8)
+# inheritance_colors = (
+#     'red', 'blue', 'orange', 'green', 'black', 'yellow', 'white'
+# )
+# inheritance_labels = (
+#     'parent1', 'parent2', 'nonseg ref', 'nonseg alt', 'nonparental', 'parent missing', 'missing'
+# )
+
+TP_states = (True, False)
+TP_colors = ('green', 'red')
+TP_labels = ('TP', 'FP')
+
+def plot_annotation_diagnostics(variants, annotation, bins):
+    
+#     variants, calldata = callset['variants'], callset['calldata']
+#     genotypes = calldata['genotype']
+#     parent_diplotype = genotypes[:, :2]
+#     progeny_haplotypes = genotypes[:, 2:]
+#     n_progeny = progeny_haplotypes.shape[1]
+#     inheritance = anhima.ped.diploid_inheritance(parent_diplotype, progeny_haplotypes)
+    TPs = variants['IsInTruth']
+    
+#     if annotation == 'n_called':
+#         ann = np.sum(genotypes >= 0, axis=1)
+#     else:
+    ann = variants[annotation]
+    n_variants, bins = np.histogram(ann, bins=bins)
+#     n_calls = n_variants * n_progeny
+
+    fig = plt.figure(figsize=(9, 3))
+    ax1 = fig.add_subplot(1, 2, 1)
+    ax2 = fig.add_subplot(1, 2, 2)
+#     ax3 = fig.add_subplot(3, 1, 3)
+
+    pc_bottom = 0
+    n_bottom = 0
+    counts = dict()
+    for st, lbl, clr in zip(TP_states, TP_labels, TP_colors):
+#         values = np.sum(TPs == st, axis=1)
+        values = (TPs == st)
+        n, _, _ = scipy.stats.binned_statistic(ann, values, statistic='sum', bins=bins)
+        counts[st] = n
+        left = bins[:-1]
+        width = np.diff(bins)
+        # plot absolute numbers
+        ax1.bar(left, n, width=width, bottom=n_bottom, color=clr, label=lbl, lw=1)
+        n_bottom += n
+        # plot percentages
+        pc = n * 100 / n_variants
+        ax2.bar(left, pc, width=width, bottom=pc_bottom, color=clr, label=lbl, lw=0)
+        pc_bottom += pc
+        
+#     # plot rates
+#     n_het = variants['is_het']
+#     het_rate = n_het * 100 / n_calls
+    
+#     n_missing = counts[anhima.ped.INHERIT_MISSING] + counts[anhima.ped.INHERIT_PARENT_MISSING]
+#     missing_rate = n_missing * 100 / n_calls
+#     n_error = counts[anhima.ped.INHERIT_NONPARENTAL]
+#     error_rate = n_error * 100 / (n_calls - n_missing)
+#     x = (bins[1:] + bins[:-1]) / 2
+#     ax3.plot(x, error_rate, lw=2, label='error rate')
+#     ax3.plot(x, missing_rate, lw=2, label='missing rate')
+
+    for s in 'top', 'left', 'right':
+        ax1.spines[s].set_visible(False)
+    ax1.xaxis.tick_bottom()
+    ax1.set_yticks([])
+    ax1.set_xlim(bins[0], bins[-1])
+    ax1.set_ylabel('#calls')
+    ax2.set_ylim(0, 100)
+    ax2.set_xlim(bins[0], bins[-1])
+    ax2.set_ylabel('%calls')
+#     ax3.set_xlim(bins[0], bins[-1])
+#     ax3.set_ylim(0, 20)
+#     ax3.legend()
+    fig.suptitle(annotation, fontsize=14, fontweight='bold')
+    fig.tight_layout()
+
+# <codecell>
+
+comparison_arrays['default']
+
+# <codecell>
+
+test_filters = collections.OrderedDict()
+test_variants = collections.OrderedDict()
+# for pipeline in pipelines_complete:
+for pipeline in tbl_pipelines.values('PIPELINE_NAME').array():
+    print(pipeline)
+    test_filters[pipeline] = (
+        (comparison_arrays[pipeline]['IsInGATK']) &
+        (comparison_arrays[pipeline]['RegionType'] == 'Core') &
+        (comparison_arrays[pipeline]['IsCoding'] == 'True') &
+        (comparison_arrays[pipeline]['IsAccessible'] == True) &
+        (np.in1d(comparison_arrays[pipeline]['mode'], ['IND', 'False__INDEL', 'False__True__IND', 'INDEL__True']))
+    #     (comparison_arrays['alistair_ann']['STR'] == True)
+    )
+    test_variants[pipeline] = comparison_arrays[pipeline][test_filters[pipeline]]
+
+# <codecell>
+
+tbl_pipelines.values('PIPELINE_NAME').array()
+
+# <codecell>
+
+test_variants['default']
+
+# <codecell>
+
+comparison_arrays
+
+# <codecell>
+
+test_filters = (
+    (comparison_arrays['default']['IsInGATK']) &
+    (comparison_arrays['default']['RegionType'] == 'Core') &
+    (comparison_arrays['default']['IsCoding'] == 'True') &
+    (comparison_arrays['default']['IsAccessible'] == True) &
+    (comparison_arrays['default']['mode'] == 'IND')
+#     (comparison_arrays['alistair_ann']['STR'] == True)
+)
+test_variants = comparison_arrays['default'][test_filters]
+
+# <codecell>
+
+print(np.unique(comparison_arrays['default']['IsInGATK'], return_counts=True))
+print(np.unique(comparison_arrays['default']['RegionType'] == 'Core', return_counts=True))
+print(np.unique(comparison_arrays['default']['IsCoding'] == 'True', return_counts=True))
+print(np.unique(comparison_arrays['default']['IsAccessible'] == True, return_counts=True))
+print(np.unique(comparison_arrays['default']['mode'] == 'SNP', return_counts=True))
+print(np.unique(comparison_arrays['default']['mode'] == 'False__INDEL', return_counts=True))
+print(np.unique(comparison_arrays['default']['mode'] == 'False__True__IND', return_counts=True))
+print(np.unique(comparison_arrays['default']['mode'] == 'INDEL__True', return_counts=True))
+print(np.unique(comparison_arrays['default']['mode'] == 'IND', return_counts=True))
+print(np.unique(comparison_arrays['default']['mode'], return_counts=True))
+print(np.unique(comparison_arrays['default']['IsInTruth'], return_counts=True))
+
+# <codecell>
+
+print(np.unique(comparison_arrays['alistair_ann']['IsInGATK'], return_counts=True))
+print(np.unique(comparison_arrays['alistair_ann']['RegionType'] == 'Core', return_counts=True))
+print(np.unique(comparison_arrays['alistair_ann']['IsCoding'] == 'True', return_counts=True))
+print(np.unique(comparison_arrays['alistair_ann']['IsAccessible'] == True, return_counts=True))
+print(np.unique(comparison_arrays['alistair_ann']['mode'] == 'SNP', return_counts=True))
+print(np.unique(comparison_arrays['alistair_ann']['mode'] == 'IND', return_counts=True))
+print(np.unique(comparison_arrays['alistair_ann']['mode'], return_counts=True))
+print(np.unique(comparison_arrays['alistair_ann']['IsInTruth'], return_counts=True))
+
+# <codecell>
+
+for pipeline in pipelines_complete:
+    print(pipeline)
+    plot_annotation_diagnostics(test_variants[pipeline], 'gatk_VQSLOD', np.linspace(-2, 10, 100))
+    plt.show()
+    
+
+# <codecell>
+
+for pipeline in pipelines_complete:
+    for annotation, bins in annotations:
+        print(pipeline)
+        plot_annotation_diagnostics(test_variants[pipeline], annotation, bins)
+        plt.show()
+    
+
+# <codecell>
+
+def plot_mendel_error_roc(variants, annotation, bins, comp, ax=None, xlim=(0, 3)):
+    
+    # setup axes
+    if ax is None:
+        fig, ax = plt.subplots()
+        sns.despine(ax=ax)
+        sns.offset_spines(ax=ax)
+        ax.set_title('%s %s' % (comp, annotation), fontsize=16)
+
+    ann = variants[annotation]
+    TPs = variants['IsInTruth']    
+    
+    x = list()
+    y = list()
+    v = list()
+    for t in bins:
+        if comp == 'min':
+            flt = (ann >= t)
+        elif comp == 'max':
+            flt = (ann <= t)
+        P = TPs[flt]
+#         np.compress(flt, TPs, axis=0)
+#         n_missing = np.count_nonzero((inh == anhima.ped.INHERIT_MISSING) | (inh == anhima.ped.INHERIT_PARENT_MISSING))
+        n_error = np.count_nonzero(P == False)
+        n_calls = P.size
+        if n_calls - n_missing > 0:
+            error_rate = n_error * 100 / (n_calls - n_missing)
+            x.append(error_rate)
+            y.append(np.count_nonzero(flt))
+            v.append(t)
+    ax.plot(x, y, 
+            marker='o', 
+            linewidth=3, 
+            markersize=9, 
+            markerfacecolor='w', 
+            markeredgewidth=0, 
+            label='%s %s' % (comp, annotation))
+    for xi, yi, vi in zip(x, y, v):
+        if isinstance(vi, int):
+            ax.annotate('%d' % vi, xy=(xi, yi), fontsize=7, ha='center', va='center')
+        else:
+            ax.annotate('%.2f' % vi, xy=(xi, yi), fontsize=7, ha='center', va='center')
+
+    # tidy up
+    ax.set_xlim(*xlim)
+    n = variants.size
+    ax.set_ylim(0, n)
+    ax.set_ylabel('# variants')
+    ax.set_xlabel('% error calls')
+    ax.legend(bbox_to_anchor=(1, 1), loc='upper left')
+    return ax
+
+# <codecell>
+
+
+# <codecell>
+
+
+# <codecell>
+
+
+# <codecell>
+
 
 # <codecell>
 
@@ -787,54 +1309,6 @@ tbl_whole_genome_comparisons[isolate_code].valuecounts('RegionType')
 # <headingcell level=1>
 
 # Process all data
-
-# <codecell>
-
-rewrite=False
-
-isolate_codes = list(tbl_samples_to_process.values('Isolate code'))
-# isolate_codes = ['7G8']
-chromosomes = ['Pf3D7_%02d_v3' % chrom for chrom in range(1,15)]
-
-tbl_comparisons = collections.OrderedDict()
-tbl_whole_genome_comparisons = collections.OrderedDict()
-
-tbl_comparison_all_cache_fn = os.path.join(CACHE_DIR, 'tbl_comparison', "tbl_comparison_all")
-
-# if not os.path.exists(tbl_comparison_all_cache_fn) or rewrite:
-for isolate_code in isolate_codes:
-    tbl_comparisons[isolate_code] = collections.OrderedDict()
-    for chromosome in chromosomes:
-        print(isolate_code, chromosome)
-        tbl_comparisons[isolate_code][chromosome] = assess_validation(isolate_code, chromosome, rewrite=rewrite)
-
-    tbl_comparison_sample_cache_fn = os.path.join(CACHE_DIR, 'tbl_comparison', "tbl_comparison_%s" % (isolate_code))
-    if not os.path.exists(tbl_comparison_sample_cache_fn) or rewrite:
-        tbl_whole_genome_comparisons[isolate_code] = (
-            tbl_comparisons[isolate_code]['Pf3D7_01_v3']
-            .cat(tbl_comparisons[isolate_code]['Pf3D7_02_v3'])
-            .cat(tbl_comparisons[isolate_code]['Pf3D7_03_v3'])
-            .cat(tbl_comparisons[isolate_code]['Pf3D7_04_v3'])
-            .cat(tbl_comparisons[isolate_code]['Pf3D7_05_v3'])
-            .cat(tbl_comparisons[isolate_code]['Pf3D7_06_v3'])
-            .cat(tbl_comparisons[isolate_code]['Pf3D7_07_v3'])
-            .cat(tbl_comparisons[isolate_code]['Pf3D7_08_v3'])
-            .cat(tbl_comparisons[isolate_code]['Pf3D7_09_v3'])
-            .cat(tbl_comparisons[isolate_code]['Pf3D7_10_v3'])
-            .cat(tbl_comparisons[isolate_code]['Pf3D7_11_v3'])
-            .cat(tbl_comparisons[isolate_code]['Pf3D7_12_v3'])
-            .cat(tbl_comparisons[isolate_code]['Pf3D7_13_v3'])
-            .cat(tbl_comparisons[isolate_code]['Pf3D7_14_v3'])
-            .sort('gatk_VQSLOD', reverse=True)
-        )
-        etl.topickle(tbl_whole_genome_comparisons[isolate_code], tbl_comparison_sample_cache_fn)
-    else:
-        tbl_whole_genome_comparisons[isolate_code] = etl.frompickle(tbl_comparison_sample_cache_fn)
-
-#     etl.topickle(tbl_whole_genome_comparisons, tbl_comparison_all_cache_fn)
-# else:
-#     tbl_whole_genome_comparisons = etl.frompickle(tbl_comparison_all_cache_fn)
-
 
 # <codecell>
 
