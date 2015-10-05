@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-# <nbformat>3.0</nbformat>
 
-# <codecell>
+# coding: utf-8
+
+# In[1]:
 
 # add following as first line of notebook to use
 # %run standard_imports.ipynb
@@ -36,7 +36,7 @@ import sklearn.decomposition
 import sklearn.manifold
 import pyfasta
 import pysam
-# import pysamstats
+import pysamstats
 import petl
 import petl as etl
 etl.repr_index_header = True
@@ -51,7 +51,8 @@ import sh
 import Bio
 from Bio import SeqIO
 
-# <codecell>
+
+# In[2]:
 
 def print_library_versions():
     print('python', sys.version)
@@ -70,10 +71,13 @@ def print_library_versions():
     print('tables', tables.__version__)
     print('vcfplt', vcfplt.__version__)
 
-# <codecell>
+
+# In[3]:
 
 print_library_versions()
 
-# <codecell>
+
+# In[ ]:
+
 
 
