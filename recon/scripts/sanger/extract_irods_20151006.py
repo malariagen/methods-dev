@@ -5,7 +5,7 @@ import os
 etl.repr_index_header = True
 
 plate_name = "W36000_QC417090_418525_417089_409377_20151001"
-oxford_plate_name = "DK_KR_iPLEX_DKNNNN_WNNNN"
+oxford_plate_name = "DK_KR_iPLEX_DK_20151006"
 imeta_cmd = "imeta qu -z seq -d sequenom_plate = %s" % plate_name
 irods_data_dir = "/nfs/team112_internal/rp7/recon/sanger_sequenom/irods_data/%s" % plate_name
 combined_data_fn = "/nfs/team112_internal/rp7/recon/sanger_sequenom/combined_data/%s.txt" % plate_name
