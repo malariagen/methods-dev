@@ -1,63 +1,72 @@
-# -*- coding: utf-8 -*-
-# <nbformat>3.0</nbformat>
 
-# <headingcell level=1>
+# coding: utf-8
 
-# Setup
+# # Setup
 
-# <codecell>
+# In[2]:
 
-%run _shared_setup.ipynb
+get_ipython().magic('run _shared_setup.ipynb')
 CACHE_DIR = os.path.join(CACHE_DIR, '20150918_assess_indel_filtering')
 PROCESSED_ASSEMBLED_SAMPLES_DIR = '/lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/validation_results'
 
-# <codecell>
+
+# In[213]:
 
 PIPELINES_FN='%s/src/github/malariagen/methods-dev/pf3k_techbm/scripts/gatk_pipeline/pipeline_parameters_20150918.xlsx' % os.environ['HOME']
 OUTPUT_DIR = '/lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/consensus_alignment'
-!mkdir -p {OUTPUT_DIR}
+get_ipython().system('mkdir -p {OUTPUT_DIR}')
 NUCMER_DIR='~/src/github/malariagen/methods-dev/pf3k_techbm/opt_4/mummer/MUMmer3.23'
 
-# <codecell>
+
+# In[3]:
 
 # CODING_EFFECTS = ['NON_SYNONYMOUS_CODING', 'SYNONYMOUS_CODING', 'STOP_GAINED']
 NONCODING_EFFECTS = ['INTERGENIC', 'INTRON', 'TRANSCRIPT']
  
 
-# <codecell>
+
+# In[282]:
 
 ref_dict=SeqIO.to_dict(SeqIO.parse(open(REF_GENOME), "fasta"))
 
-# <codecell>
+
+# In[3]:
+
+REF_GENOME
+
+
+# In[283]:
 
 ref_dict['Pf3D7_10_v3']
 
-# <codecell>
+
+# In[285]:
 
 # location of CRT "CVMNK" etc haplotypes 
 ref_dict['Pf3D7_07_v3'][403610:403633]
 
-# <codecell>
+
+# In[214]:
 
 NUCMER_DIR
 
-# <headingcell level=1>
 
-# Load data
+# # Load data
 
-# <codecell>
+# In[5]:
 
 tbl_pipelines = etl.fromxlsx(PIPELINES_FN)
 tbl_pipelines.display(index_header=True)
 
-# <codecell>
+
+# In[5]:
 
 
-# <headingcell level=1>
 
-# Determine samples
 
-# <codecell>
+# # Determine samples
+
+# In[189]:
 
 def determine_assembly_fasta(isolate_code='7G8'):
     if isolate_code in ('7G8', 'GB4'):
@@ -65,7 +74,8 @@ def determine_assembly_fasta(isolate_code='7G8'):
     else:
         return("/nfs/pathogen003/tdo/Pfalciparum/PF3K/Reference12Genomes/Sharing_25Jun2015/Pf%s.Jun2015.fasta" % isolate_code)
 
-# <codecell>
+
+# In[190]:
 
 tbl_samples_to_process = (tbl_assembled_samples
     .cutout('Notes')
@@ -84,17 +94,17 @@ tbl_samples_to_process = (tbl_assembled_samples
 )
 tbl_samples_to_process.displayall(index_header=True)
 
-# <codecell>
+
+# In[191]:
 
 assembly_fastas = etl.lookupone(tbl_samples_to_process, 'Isolate code', 'assembly_fasta')
 print(assembly_fastas['7G8'])
 print(assembly_fastas['KH02'])
 
-# <headingcell level=1>
 
-# Functions
+# # Functions
 
-# <codecell>
+# In[7]:
 
 def determine_consensus_region(rec, column1=4, column2=11):
     if rec[column1] is None:
@@ -107,7 +117,8 @@ def determine_consensus_region(rec, column1=4, column2=11):
         return "ERROR__%s__%s" % (rec[column1], rec[column2])
     
 
-# <codecell>
+
+# In[8]:
 
 def determine_consensus_region2(rec, column1=4, column2=41, column3=79):
     vals = []
@@ -121,7 +132,8 @@ def determine_consensus_region2(rec, column1=4, column2=41, column3=79):
     return('__'.join(unique_vals))
     
 
-# <codecell>
+
+# In[376]:
 
 def upstream(prv, cur, nxt):
     if prv is None or prv.CHROM != cur.CHROM:
@@ -143,12 +155,14 @@ def nearest(distance_previous, distance_next):
     else:
         return(min(distance_previous, distance_next))
 
-# <codecell>
+
+# In[ ]:
 
 # def nearest_consensus(prv, cur, nxt):
     
 
-# <codecell>
+
+# In[10]:
 
 def determine_mode(rec):
     if len(rec['REF']) == len(str(rec['ALT'])):
@@ -156,7 +170,8 @@ def determine_mode(rec):
     else:
         return('INDEL')
 
-# <codecell>
+
+# In[11]:
 
 def trim_variants(ref, alt):
 #     print(ref, alt)
@@ -167,14 +182,16 @@ def trim_variants(ref, alt):
  
 trim_variants('AATC', 'TC')[1]
 
-# <codecell>
+
+# In[12]:
 
 fields_to_compare = ['QUAL', 'FILTER', 'AC', 'AF', 'AN', 'BaseQRankSum', 'ClippingRankSum', 'DP', 'FS', 'MLEAC', 'MLEAF', 'MQ',
                      'MQRankSum', 'QD', 'ReadPosRankSum', 'RegionType', 'SNPEFF_EFFECT', 'SNPEFF_FUNCTIONAL_CLASS',
                      'SNPEFF_IMPACT', 'SOR', 'VQSLOD', 'culprit', 'set', 'AD', 'GT']
 gatk_renames = dict(zip(fields_to_compare, ['gatk_%s' % field_name for field_name in fields_to_compare]))
 
-# <codecell>
+
+# In[13]:
 
 def assess_validation(isolate_code='7G8', chromosome='Pf3D7_01_v3', MAPPING_DIR='bwa_mem', BAMS_DIR='gatk_rec',
                       UNFILTERED_DIR='HaplotypeCaller', FILTERED_DIR='alistair_ann', ANNOTATED_DIR='SnpEff_region',
@@ -303,11 +320,13 @@ def assess_validation(isolate_code='7G8', chromosome='Pf3D7_01_v3', MAPPING_DIR=
         
     return(tbl_comparison)
 
-# <codecell>
+
+# In[14]:
 
 pipelines_complete = ['default', 'alistair_ann']
 
-# <codecell>
+
+# In[15]:
 
 rewrite=False
 
@@ -381,7 +400,8 @@ for rec in tbl_pipelines.data():
         #     tbl_whole_genome_comparisons = etl.frompickle(tbl_comparison_all_cache_fn)
 
 
-# <codecell>
+
+# In[418]:
 
 (tbl_whole_genome_comparisons['alistair_ann']
 .selecteq('Sample', '7G8')
@@ -392,7 +412,8 @@ for rec in tbl_pipelines.data():
 .display(20)
 )
 
-# <codecell>
+
+# In[423]:
 
 (tbl_whole_genome_comparisons['alistair_ann']
 .selecteq('Sample', '7G8')
@@ -404,7 +425,8 @@ for rec in tbl_pipelines.data():
 .display(20)
 )
 
-# <codecell>
+
+# In[16]:
 
 rewrite=False
 
@@ -481,17 +503,20 @@ for rec in tbl_pipelines.sort('PIPELINE_NAME').data():
             comparison_array = np.load(comparison_array_cache_fn)
         comparison_arrays[rec[0]] = comparison_array
 
-# <codecell>
+
+# In[17]:
 
 print(len(tbl_whole_genome_comparisons['default'].data()))
 print(len(tbl_whole_genome_comparisons['alistair_ann'].data()))
 
-# <codecell>
+
+# In[18]:
 
 print(shape(comparison_arrays['default']))
 print(shape(comparison_arrays['alistair_ann']))
 
-# <codecell>
+
+# In[19]:
 
 test_filters = collections.OrderedDict()
 test_variants = collections.OrderedDict()
@@ -508,14 +533,15 @@ for pipeline in pipelines_complete:
     )
     test_variants[pipeline] = comparison_arrays[pipeline][test_filters[pipeline]]
 
-# <codecell>
+
+# In[ ]:
 
 
-# <headingcell level=1>
 
-# Create consensus alignments
 
-# <codecell>
+# # Create consensus alignments
+
+# In[318]:
 
 import copy
 def create_consensus(sample='7G8',
@@ -569,13 +595,15 @@ def create_consensus(sample='7G8',
         SeqIO.write(mutable_ref_dict[chrom], fasta_fo, "fasta")
     
 
-# <codecell>
+
+# In[319]:
 
 for sample in tbl_samples_to_process['Isolate code']:
     print(sample)
     create_consensus(sample)
 
-# <codecell>
+
+# In[227]:
 
 def run_nucmer(sample='7G8',
                fasta_output_format='/lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/consensus_alignment/fasta/%s.fasta',
@@ -585,22 +613,25 @@ def run_nucmer(sample='7G8',
     assembly_fasta = assembly_fastas[sample]
     output_filestem = nucmer_output_format % sample
     
-    !{NUCMER_DIR}/nucmer -p {output_filestem} {gatk_fasta} {assembly_fasta}
-    !{NUCMER_DIR}/delta-filter -m -i {delta_filter_i} -l 1000 {output_filestem}.delta > {output_filestem}.filter.delta
-    !{NUCMER_DIR}/show-coords -THqcl -o {output_filestem}.filter.delta > {output_filestem}.filter.coords
-    !{NUCMER_DIR}/show-snps -CHTr {output_filestem}.filter.delta > {output_filestem}.Csnp
+    get_ipython().system('{NUCMER_DIR}/nucmer -p {output_filestem} {gatk_fasta} {assembly_fasta}')
+    get_ipython().system('{NUCMER_DIR}/delta-filter -m -i {delta_filter_i} -l 1000 {output_filestem}.delta > {output_filestem}.filter.delta')
+    get_ipython().system('{NUCMER_DIR}/show-coords -THqcl -o {output_filestem}.filter.delta > {output_filestem}.filter.coords')
+    get_ipython().system('{NUCMER_DIR}/show-snps -CHTr {output_filestem}.filter.delta > {output_filestem}.Csnp')
 
-# <codecell>
+
+# In[234]:
 
 run_nucmer()
 
-# <codecell>
+
+# In[229]:
 
 for sample in tbl_samples_to_process['Isolate code']:
     print(sample)
     run_nucmer(sample)
 
-# <codecell>
+
+# In[226]:
 
 ref_chroms = ['M76611', 'PFC10_API_IRAB'] + ["Pf3D7_%02d_v3" % i for i in range(1, 15)]
 query_chroms = ["Pf%s_MT" % '7G8', "Pf%s_API" % '7G8'] + ["Pf%s_%02d" % ('7G8', i) for i in range(1, 15)]
@@ -611,7 +642,8 @@ print(chrom_dict['Pf3D7_08_v3'])
 temp = dict(zip(('M76611', 'PFC10_API_IRAB'), ('Pf7G8_MT', 'Pf7G8_API')))
 temp['M76611']
 
-# <codecell>
+
+# In[325]:
 
 def convert_Csnp(sample='7G8',
                  fasta_output_format='/lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/consensus_alignment/fasta/%s.fasta',
@@ -726,11 +758,13 @@ def convert_Csnp(sample='7G8',
     
     return(vcf_fn)
 
-# <codecell>
+
+# In[326]:
 
 convert_Csnp()
 
-# <codecell>
+
+# In[360]:
 
 def tbl_converted_coords(sample='7G8',
         pos_output_format = '/lustre/scratch110/malaria/rp7/Pf3k/GATKbuild/consensus_alignment/pos/%s.pos',
@@ -774,15 +808,18 @@ def tbl_converted_coords(sample='7G8',
     
     
 
-# <codecell>
+
+# In[361]:
 
 tbl_vcf_converted = tbl_converted_coords()
 
-# <codecell>
+
+# In[355]:
 
 tbl_vcf_converted.display(50, index_header=True)
 
-# <codecell>
+
+# In[352]:
 
 print(ref_dict['Pf3D7_01_v3'][102910 - 1]) #A
 print(ref_dict['Pf3D7_01_v3'][123620 - 1]) #C
@@ -791,26 +828,28 @@ print(ref_dict['Pf3D7_01_v3'][141192 - 1]) #C
 print(ref_dict['Pf3D7_01_v3'][147835 - 1]) #T
 print(ref_dict['Pf3D7_01_v3'][188251 - 1]) #T
 
-# <headingcell level=1>
 
-# Install vcflib
+# # Install vcflib
 
-# <codecell>
+# In[364]:
 
 # On mac, simply:
 # brew install vcflib
 
-# <codecell>
+
+# In[ ]:
 
 
-# <codecell>
 
 
-# <headingcell level=1>
+# In[ ]:
 
-# Annotate consensus alignment vcf
 
-# <codecell>
+
+
+# # Annotate consensus alignment vcf
+
+# In[367]:
 
 rewrite=True
 
@@ -828,66 +867,34 @@ for sample in tbl_samples_to_process['Isolate code']:
     convert_Csnp(sample)
     tbl_converted_coords(sample)
     
-    !vcfstreamsort < {unannotated_vcf_fn} > {sorted_vcf_fn}
+    get_ipython().system('vcfstreamsort < {unannotated_vcf_fn} > {sorted_vcf_fn}')
 
     if (not os.path.isfile(left_aligned_vcf_fn) and not os.path.isfile(annotated_vcf_fn+'.gz')) or rewrite:
-        !{gatk_exe} -T LeftAlignAndTrimVariants \
-        -R {REF_GENOME} \
-        -V {sorted_vcf_fn} \
-        -o {left_aligned_vcf_fn} \
-#         2> /dev/null
+        get_ipython().system('{gatk_exe} -T LeftAlignAndTrimVariants         -R {REF_GENOME}         -V {sorted_vcf_fn}         -o {left_aligned_vcf_fn} #         2> /dev/null')
 
     if (not os.path.isfile(snpeff_vcf_fn) and not os.path.isfile(annotated_vcf_fn+'.gz')) or rewrite:
-        !{snpeff_exe} \
-        -v -o gatk Pf3D7july2015 \
-        {left_aligned_vcf_fn} \
-        -no-downstream \
-        -no-upstream \
-        > {snpeff_vcf_fn} \
-#         2> /dev/null
+        get_ipython().system('{snpeff_exe}         -v -o gatk Pf3D7july2015         {left_aligned_vcf_fn}         -no-downstream         -no-upstream         > {snpeff_vcf_fn} #         2> /dev/null')
 
     if (not os.path.isfile(snpeff_annotated_vcf_fn) and not os.path.isfile(annotated_vcf_fn+'.gz')) or rewrite:
-        !{gatk_exe} \
-        -T VariantAnnotator \
-        -R {REF_GENOME} \
-        -A TandemRepeatAnnotator \
-        -A SnpEff \
-        --variant {left_aligned_vcf_fn} \
-        --snpEffFile {snpeff_vcf_fn} \
-        -o {snpeff_annotated_vcf_fn} \
-#         2> /dev/null
+        get_ipython().system('{gatk_exe}         -T VariantAnnotator         -R {REF_GENOME}         -A TandemRepeatAnnotator         -A SnpEff         --variant {left_aligned_vcf_fn}         --snpEffFile {snpeff_vcf_fn}         -o {snpeff_annotated_vcf_fn} #         2> /dev/null')
 
     if not os.path.isfile(annotated_vcf_fn+'.gz') or rewrite:
-        !cat {snpeff_annotated_vcf_fn} \
-        | vcf-annotate -a {regions_fn} \
-           -d key=INFO,ID=RegionType,Number=1,Type=String,Description='The type of genome region within which the variant is found. SubtelomericRepeat: repetitive regions at the ends of the chromosomes. SubtelomericHypervariable: subtelomeric region of poor conservation between the 3D7 reference genome and other samples. InternalHypervariable: chromosome-internal region of poor conservation between the 3D7 reference genome and other samples. Centromere: start and end coordinates of the centromere genome annotation. Core: everything else.' \
-           -c CHROM,FROM,TO,INFO/RegionType \
-        > {annotated_vcf_fn}
+        get_ipython().system("cat {snpeff_annotated_vcf_fn}         | vcf-annotate -a {regions_fn}            -d key=INFO,ID=RegionType,Number=1,Type=String,Description='The type of genome region within which the variant is found. SubtelomericRepeat: repetitive regions at the ends of the chromosomes. SubtelomericHypervariable: subtelomeric region of poor conservation between the 3D7 reference genome and other samples. InternalHypervariable: chromosome-internal region of poor conservation between the 3D7 reference genome and other samples. Centromere: start and end coordinates of the centromere genome annotation. Core: everything else.'            -c CHROM,FROM,TO,INFO/RegionType         > {annotated_vcf_fn}")
 
-        !bgzip -f {annotated_vcf_fn}
-        !tabix -p vcf -f {annotated_vcf_fn}.gz
+        get_ipython().system('bgzip -f {annotated_vcf_fn}')
+        get_ipython().system('tabix -p vcf -f {annotated_vcf_fn}.gz')
 
     if not os.path.isfile(annotated_vcf_fn.replace('.vcf', '.SNP.vcf')+'.gz') or rewrite:
-        !{gatk_exe} \
-        -T SelectVariants \
-        -R {REF_GENOME} \
-        -V {annotated_vcf_fn}.gz \
-        -selectType SNP \
-        -o {annotated_vcf_fn.replace('.vcf', '.SNP.vcf')} 2> /dev/null
+        get_ipython().system("{gatk_exe}         -T SelectVariants         -R {REF_GENOME}         -V {annotated_vcf_fn}.gz         -selectType SNP         -o {annotated_vcf_fn.replace('.vcf', '.SNP.vcf')} 2> /dev/null")
 
-        !bgzip -f {annotated_vcf_fn.replace('.vcf', '.SNP.vcf')}
-        !tabix -p vcf -f {annotated_vcf_fn.replace('.vcf', '.SNP.vcf')}.gz
+        get_ipython().system("bgzip -f {annotated_vcf_fn.replace('.vcf', '.SNP.vcf')}")
+        get_ipython().system("tabix -p vcf -f {annotated_vcf_fn.replace('.vcf', '.SNP.vcf')}.gz")
 
     if not os.path.isfile(annotated_vcf_fn.replace('.vcf', '.INDEL.vcf')+'.gz') or rewrite:
-        !{gatk_exe} \
-        -T SelectVariants \
-        -R {REF_GENOME} \
-        -V {annotated_vcf_fn}.gz \
-        -xlSelectType SNP \
-        -o {annotated_vcf_fn.replace('.vcf', '.INDEL.vcf')} 2> /dev/null
+        get_ipython().system("{gatk_exe}         -T SelectVariants         -R {REF_GENOME}         -V {annotated_vcf_fn}.gz         -xlSelectType SNP         -o {annotated_vcf_fn.replace('.vcf', '.INDEL.vcf')} 2> /dev/null")
 
-        !bgzip -f {annotated_vcf_fn.replace('.vcf', '.INDEL.vcf')}
-        !tabix -p vcf -f {annotated_vcf_fn.replace('.vcf', '.INDEL.vcf')}.gz
+        get_ipython().system("bgzip -f {annotated_vcf_fn.replace('.vcf', '.INDEL.vcf')}")
+        get_ipython().system("tabix -p vcf -f {annotated_vcf_fn.replace('.vcf', '.INDEL.vcf')}.gz")
 
 #         !rm {unannotated_vcf_fn}
 #         !rm {left_aligned_vcf_fn}
@@ -898,7 +905,8 @@ for sample in tbl_samples_to_process['Isolate code']:
 #         !rm {snpeff_vcf_fn}.idx
 #         !rm {snpeff_annotated_vcf_fn}.idx
 
-# <codecell>
+
+# In[397]:
 
 def merge_consensus_alignment(sample='7G8',
                       rewrite=False):
@@ -930,22 +938,26 @@ def merge_consensus_alignment(sample='7G8',
         
     return(tbl_consensus)
 
-# <codecell>
+
+# In[398]:
 
 tbl_consensus_7G8 = merge_consensus_alignment()
 
-# <codecell>
+
+# In[399]:
 
 tbl_consensus_7G8.display(10, index_header=True)
 
-# <codecell>
+
+# In[409]:
 
 (tbl_consensus_7G8
     .addfield('is_clustered', lambda rec: rec['Consensus_distance_nearest'] <= 10)
     .valuecounts('STR', 'is_clustered')
 )
 
-# <codecell>
+
+# In[412]:
 
 (tbl_consensus_7G8
     .addfield('is_clustered', lambda rec: rec['Consensus_distance_nearest'] <= 20)
@@ -953,7 +965,8 @@ tbl_consensus_7G8.display(10, index_header=True)
     .displayall()
 )
 
-# <codecell>
+
+# In[420]:
 
 (tbl_whole_genome_comparisons['alistair_ann']
 .selecteq('Sample', '7G8')
@@ -963,11 +976,13 @@ tbl_consensus_7G8.display(10, index_header=True)
 .display(20)
 )
 
-# <codecell>
+
+# In[419]:
 
 tbl_whole_genome_comparisons['alistair_ann']
 
-# <codecell>
+
+# In[413]:
 
 (tbl_consensus_7G8
     .addfield('is_clustered', lambda rec: rec['Consensus_distance_nearest'] <= 100)
@@ -975,38 +990,46 @@ tbl_whole_genome_comparisons['alistair_ann']
     .displayall()
 )
 
-# <codecell>
+
+# In[400]:
 
 len(tbl_consensus_7G8)
 
-# <codecell>
+
+# In[401]:
 
 consensus_distances_7G8 = tbl_consensus_7G8['Consensus_distance_nearest'].array()
 
-# <codecell>
+
+# In[402]:
 
 ax = hist(consensus_distances_7G8, bins=arange(0, 100, 1))
 
-# <codecell>
+
+# In[403]:
 
 len(consensus_distances_7G8)
 
-# <codecell>
+
+# In[408]:
 
 np.sum(consensus_distances_7G8>10)
 
-# <codecell>
+
+# In[389]:
 
 arange(0, 30, 1)
 
-# <codecell>
+
+# In[390]:
 
 tbl_consensus_7G8.selecteq('Consensus_distance_nearest', 1).display(10)
 
-# <codecell>
+
+# In[ ]:
 
 
-# <markdowncell>
+
 
 #     - create new version of pos file with start, end, diff of new coordinates to be used for converting back
 #     - create truth vcf from .Csnp file
@@ -1020,14 +1043,14 @@ tbl_consensus_7G8.selecteq('Consensus_distance_nearest', 1).display(10)
 # - check comparable results from 5 samples vcf and full vcf (how best to read in full vcf - talk to Alistair? maybe create small vcfs just from variant positions for that sample?)
 # - turn pipeline into a single script which takes VCF, sample name, assembly file, TP_distance and delta_filter_i, and returns #TP, #FP, #FN, #inaccessible broken down by SNP/INDEL, coding/non-coding. Is this really worth it?
 
-# <codecell>
+# In[ ]:
 
 
-# <headingcell level=1>
 
-# Testing stuff
 
-# <codecell>
+# # Testing stuff
+
+# In[166]:
 
 mutable_ref_dict = copy.deepcopy(ref_dict)
 print(mutable_ref_dict['Pf3D7_01_v3'])
@@ -1036,11 +1059,13 @@ print(mutable_ref_dict['Pf3D7_01_v3'])
 mutable_ref_dict['Pf3D7_01_v3'].seq = mutable_ref_dict['Pf3D7_01_v3'].seq.tomutable()
 print(mutable_ref_dict['Pf3D7_01_v3'])
 
-# <codecell>
+
+# In[172]:
 
 print(mutable_ref_dict['Pf3D7_01_v3'].id)
 
-# <codecell>
+
+# In[115]:
 
 print(ref_dict['Pf3D7_01_v3'].seq[93150:93170])
 print(mutable_ref_dict['Pf3D7_01_v3'][93150:93170])
@@ -1048,44 +1073,55 @@ print()
 print(ref_dict['Pf3D7_01_v3'].seq[94250:94370])
 print(mutable_ref_dict['Pf3D7_01_v3'][94250:94370])
 
-# <codecell>
+
+# In[116]:
 
 print(len(ref_dict['Pf3D7_01_v3']))
 print(len(mutable_ref_dict['Pf3D7_01_v3']))
 
-# <codecell>
+
+# In[117]:
 
 print(ref_dict['Pf3D7_01_v3'].seq[-10:-1])
 
-# <codecell>
+
+# In[118]:
 
 print(mutable_ref_dict['Pf3D7_01_v3'][-10:-1])
 
-# <codecell>
+
+# In[124]:
 
 mutable_ref_dict['Pf3D7_01_v3']
 
-# <codecell>
+
+# In[125]:
 
 ref_dict['Pf3D7_01_v3']
 
-# <codecell>
+
+# In[126]:
 
 temp = ref_dict.copy()
 
-# <codecell>
+
+# In[129]:
 
 for chrom in temp:
     temp[chrom].seq = temp[chrom].seq.tomutable()
 
-# <codecell>
+
+# In[130]:
 
 temp['Pf3D7_01_v3']
 
-# <codecell>
+
+# In[ ]:
 
 
-# <codecell>
+
+
+# In[50]:
 
 def second_allele_is_major(rec):
     if (rec['gatk_AD'][int(rec['gatk_GT'][2]) - 1]) >= int(rec['gatk_AD'][int(rec['gatk_GT'][0]) -1]):
@@ -1093,7 +1129,8 @@ def second_allele_is_major(rec):
     else:
         return False
 
-# <codecell>
+
+# In[53]:
 
 (tbl_whole_genome_comparisons['alistair_ann']
 .selecteq('Sample', '7G8')
@@ -1107,7 +1144,8 @@ def second_allele_is_major(rec):
 .displayall()
 )
 
-# <codecell>
+
+# In[85]:
 
 (tbl_whole_genome_comparisons['alistair_ann']
     .selecteq('Sample', '7G8')
@@ -1119,7 +1157,8 @@ def second_allele_is_major(rec):
     .display(index_header=True)
 )
 
-# <codecell>
+
+# In[182]:
 
 (tbl_whole_genome_comparisons['alistair_ann']
     .selecteq('Sample', '7G8')
