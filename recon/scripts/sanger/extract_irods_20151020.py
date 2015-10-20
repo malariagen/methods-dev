@@ -5,13 +5,14 @@ import os
 etl.repr_index_header = True
 
 plate_name = "W36000_QC417090_418525_417089_409377_20151001"
-oxford_plate_name = "DK_KR_iPLEX_DK_20151006"
+oxford_plate_name = "DK_KR_iPLEX_DK_20151020"
 imeta_cmd = "imeta qu -z seq -d sequenom_plate = %s" % plate_name
 irods_data_dir = "/nfs/team112_internal/rp7/recon/sanger_sequenom/irods_data/%s" % plate_name
 combined_data_fn = "/nfs/team112_internal/rp7/recon/sanger_sequenom/combined_data/%s.txt" % plate_name
 processed_data_fn = "/nfs/team112_internal/rp7/recon/sanger_sequenom/processed_data/%s_heights.xls" % oxford_plate_name
 sample_mappings_fn = "/nfs/team112_internal/rp7/recon/sanger_sequenom/sample_mappings/Chris_Jacob_SQNM_various_Oct2015.xlsx"
 sample_mappings_sheet_name = "sample_sets"
+sample_set_code = "DK1092"
 rextract_irods = False
 
 subprocess.call("mkdir -p %s" % irods_data_dir, shell=True)
@@ -33,14 +34,14 @@ for i in range(int(len(imeta_out)/3)):
         combined_file_cmd = "tail -n +2 %s >> %s" % (local_path, combined_data_fn)
     _ = subprocess.call(combined_file_cmd, shell=True)
 
-tbl_sample_mappings = etl.fromxlsx(sample_mappings_fn, sample_mappings_sheet_name)
+tbl_sample_mappings = etl.fromxlsx(sample_mappings_fn, sample_mappings_sheet_name).selecteq('384_sample_set_code', sample_set_code)
 
 tbl_processed = (etl.fromtsv(combined_data_fn)
     .convertnumbers()
     .update('PLATE', oxford_plate_name)
     .convert('ASSAY_ID', 'replace', 'W36000-', '')
     .leftjoin(tbl_sample_mappings, lkey='WELL_POSITION', rkey='384_position_code')
-    # .cutout('SAMPLE_ID')
+    .cutout('SAMPLE_ID')
     .rename('sample_code', 'SAMPLE_ID')
     .rename('STATUS', 'DESCRIPTION')
     .cut(['CUSTOMER', 'PROJECT', 'PLATE', 'EXPERIMENT', 'CHIP', 'WELL_POSITION',
