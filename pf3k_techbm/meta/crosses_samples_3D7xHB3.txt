@@ -1,0 +1,22 @@
+clone	sample	run	instrument	coverage
+3D7	PG0051-C	ERR019061	Illumina Genome Analyzer II	122.0
+C01	PG0065-C	ERR019064	Illumina Genome Analyzer II	163.0
+C01	PG0062-C	ERR019070	Illumina Genome Analyzer II	108.0
+C02	PG0055-C	ERR019066	Illumina Genome Analyzer II	102.0
+C02	PG0056-C	ERR019068	Illumina Genome Analyzer II	84.0
+C02	PG0067-C	ERR019073	Illumina Genome Analyzer II	126.0
+C02	PG0053-C	ERR019067	Illumina Genome Analyzer II	73.0
+C03	PG0066-C	ERR019072	Illumina Genome Analyzer II	79.0
+C04	PG0061-C	ERR019059	Illumina Genome Analyzer II	165.0
+C05	PG0068-C	ERR019065	Illumina Genome Analyzer II	41.0
+C06	PG0069-C	ERR019055	Illumina Genome Analyzer II	135.0
+C07	PG0070-C	ERR019056	Illumina Genome Analyzer II	144.0
+C08	PG0071-C	ERR019074	Illumina Genome Analyzer II	120.0
+C09	PG0072-C	ERR019057	Illumina Genome Analyzer II	173.0
+C10	PG0063-C	ERR019060	Illumina Genome Analyzer II	108.0
+C11	PG0064-C	ERR019071	Illumina Genome Analyzer II	48.0
+C12	PG0058-C	ERR019063	Illumina Genome Analyzer II	51.0
+C13	PG0054-C	ERR019062	Illumina Genome Analyzer II	95.0
+C14	PG0060-C	ERR019058	Illumina Genome Analyzer II	102.0
+C15	PG0057-C	ERR019069	Illumina Genome Analyzer II	56.0
+HB3	PG0052-C	ERR019054	Illumina Genome Analyzer II	100.0

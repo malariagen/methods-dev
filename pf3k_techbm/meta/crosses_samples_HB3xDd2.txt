@@ -1,0 +1,38 @@
+clone	sample	run	instrument	coverage
+1BB5	PG0023-C	ERR015449	Illumina Genome Analyzer II	22.0
+3BA6	PG0022-Cx	ERR126027	Illumina HiSeq 2000	32.0
+3BD5	PG0024-C	ERR019053	Illumina Genome Analyzer II	92.0
+7C101	PG0074-C	ERR019048	Illumina Genome Analyzer II	98.0
+7C111	PG0038-C	ERR015457	Illumina Genome Analyzer II	148.0
+7C12	PG0035-Cx	ERR037704	Illumina HiSeq 2000	637.0
+7C126	PG0047-C	ERR015452	Illumina Genome Analyzer II	187.0
+7C140	PG0039-C	ERR015454	Illumina Genome Analyzer II	78.0
+7C159	PG0040-Cx	ERR107475	Illumina HiSeq 2000	59.0
+7C16	PG0036-C	ERR015455	Illumina Genome Analyzer II	26.0
+7C170	PG0041-C	ERR015446	Illumina Genome Analyzer II	130.0
+7C183	PG0042-C	ERR015448	Illumina Genome Analyzer II	118.0
+7C188	PG0030-C	ERR019046	Illumina Genome Analyzer II	171.0
+7C20	PG0037-C	ERR015451	Illumina Genome Analyzer II	82.0
+7C3	PG0034-C	ERR019047	Illumina Genome Analyzer II	142.0
+7C408	PG0031-C	ERR015458	Illumina Genome Analyzer II	51.0
+7C421	PG0043-C	ERR015459	Illumina Genome Analyzer II	164.0
+7C424	PG0044-C	ERR019043	Illumina Genome Analyzer II	172.0
+7C46	PG0046-Cx	ERR107476	Illumina HiSeq 2000	62.0
+7C7	PG0048-C	ERR019049	Illumina Genome Analyzer II	110.0
+B1SD	PG0015-C	ERR019044	Illumina Genome Analyzer II	91.0
+B4R3	PG0018-C	ERR019042	Illumina Genome Analyzer II	115.0
+CH3_116	PG0032-Cx	ERR037703	Illumina HiSeq 2000	186.0
+CH3_61	PG0033-Cx	ERR175544	Illumina HiSeq 2000	68.0
+D43	PG0029-Cx	ERR107474	Illumina HiSeq 2000	34.0
+DD2	PG0008-CW	ERR012840	Illumina Genome Analyzer II	122.0
+GC03	PG0021-C	ERR015447	Illumina Genome Analyzer II	152.0
+GC06	PG0028-C	ERR015456	Illumina Genome Analyzer II	54.0
+HB3	PG0004-CW	ERR012788	Illumina Genome Analyzer II	80.0
+QC01	PG0017-C	ERR019050	Illumina Genome Analyzer II	117.0
+QC13	PG0016-C	ERR012895	Illumina Genome Analyzer II	68.0
+QC23	PG0045-C	ERR012892	Illumina Genome Analyzer II	115.0
+QC34	PG0026-C	ERR015453	Illumina Genome Analyzer II	55.0
+SC01	PG0025-C	ERR019045	Illumina Genome Analyzer II	149.0
+SC05	PG0019-C	ERR019051	Illumina Genome Analyzer II	97.0
+TC05	PG0027-C	ERR015450	Illumina Genome Analyzer II	115.0
+TC08	PG0020-C	ERR019052	Illumina Genome Analyzer II	144.0
