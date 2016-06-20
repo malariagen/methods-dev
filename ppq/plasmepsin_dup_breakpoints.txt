@@ -1,0 +1,35 @@
+289550-289701
+P1 Ref:
+CAAAAATACCTTCATATTAGGTGACCCATTCATGAGAAAATATTTCACCGTCTTTGATTATGATAATCACACTGTTGGTTTCGCCCTTGCCAAAAAAAAATTGTAAATCACGTTAAATAAATGAATTCAGATTGAAAGATAAAACTGTGTA
+Dup:
+                                             T     T A      C
+                                             
+            TG TC             T              T     T A      C
+
+298720-298871
+P3 Ref:
+AAAAAATACCTTTGTTCTAGGTGACCCATTTATGAGAAAATATTTTACCGTTTATGATTACGATAATCACACCGTTGGATTTGCTTTAGCCAAAAATTTATAAAGCAAAAAAATTATAATTAAAGCAAAATAAAGAAAAATAAAGAAAAA
+Dup:
+                                                                        T     T  C  CC
+
+Breakpoint full sequence
+AAAAAATACCTTTGTTCTAGGTGACCCATTTATGAGAAAATATTTTACCGTTTATGATTACGATAATCACACTGTTGGTTTCGCCCTTGCCAAAAAAAAATTGTAAATCACGTTAAATAAATGAATTCAGATTGAAAGATAAAACTGTGTA
+
+Breakpoint
+                                                             GATAATCACAC
+
+Breakpoint sequence 1bp either side
+                                                            CGATAATCACACT
+
+Breakpoint sequence 5bp either side
+                                                        ATTACGATAATCACACTGTTG
+
+Breakpoint sequence 10bp either side
+                                                   TTATGATTACGATAATCACACTGTTGGTTTC
+
+Breakpoint sequence 15bp either side
+                                              ACCGTTTATGATTACGATAATCACACTGTTGGTTTCGCCCT
+
+Breakpoint sequence 20bp either side
+                                         ATTTTACCGTTTATGATTACGATAATCACACTGTTGGTTTCGCCCTTGCCA
+                                                   
